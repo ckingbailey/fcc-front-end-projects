@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<!--This is made to use Foundation. I just started using GitHub and I don't know how to implement Foundation on here yet.-->
+<head>
+<!--this is the links to the CSS. Is this gonna work? I can't find a guide. I gotta get some help with this part. Gitter, here I come.-->
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/foundation/6.2.0/foundation.min.css"/>
+
+</head>
+
+<!--this row contains the callout-secondary that contains all content except byline-->
+<div class="row">
+<div class="small-10 small-offset-1 column">
+<div class="callout secondary">
+
+<!--this row contains the headline-->
+<div class="row">
+<div class="small-12 column">
+<h1 class="text-center"><big>Nina Katchadourian</big></h1>
+<h2 class="text-center subheader"><em>Laconic and subtly disarming</em></h2>
+</div>
+</div>
+
+<!--this row contains the image-->
+<div class="row">
+<div class="small-12 column">
+<div class="callout">
+<img class="img-responsive" src="http://www.ninakatchadourian.com/photography/images/sa-flemish/Flemish19.jpg" alt="a photo of Nina Katchadourian in Renaissance Flemish costume made from a neck pillow and toilet seat covers">
+<p class="caption text-center">One of Nina Katchadourian's <em>Lavatory Portraits in the Flemish Style</em>, part of her <em>Seat Assignment</em> series.</p>
+</img>
+</div>
+
+</div>
+</div>
+
+<!--this row contains all main written content-->
+<div class="row">
+<div class="small-10 small-offset-1 column">
+<div class="callout">
+
+<!--this row contains the blurb about the artist-->
+<div class="row">
+<div class="small-12 column">
+<p>Nina Katchadourian is a conceptual artist based in Brooklyn, NY. Her work comprises photography, video, sculpture, and public interventions such as a fleet of cars dispersed throughout Brooklyn whose horns make bird calls. She often uses mundane, commonplace materials in her sculpture and photography, elevating the banal through close examination to the level of the sublime. Much of her art relies on humor to draw the viewer in, only to reveal a quiet contemplativeness and a reverence for life’s unregarded moments. Common themes in her art include travel, tacky facsimiles of conventionally beautiful objects, absurdist repairs or improvements to the natural world, and revealing hidden meaning where there in fact may be none.
+<br>Katchadourian came to popular attention in 2010 with her YouTube video <a href="https://www.youtube.com/watch?v=bpfbbolyOKY" target="_blank">Skymall Kitties</a>. More recently she participated in the Armenian Pavilion at the 2015 Venice Biennale, which won the Golden Lion Award for National Participation, and contributed to Creative Time, a series of art installations in New York’s Central Park in summer 2015. She has been an artist-in-residence at San Francisco’s Exploratorium since 2013 and is currently working on a project for the museum.
+</p>
+</div>
+</div>
+
+<!--this row contains the timeline-->
+<div class="row">
+<div class="small-12 column">
+<div class="callout primary">
+<h3>Timeline of Nina Katchadourian's life:</h3>
+
+<ul>
+<li><strong>1968</strong> - Born, Stanford, CA</li>
+<li><strong>1972(?)</strong> - Participated in <a href="https://en.wikipedia.org/wiki/Stanford_marshmallow_experiment" target="_blank">Stanford Marshmallow Test</a></li>
+<li><strong>1989</strong> - BA, Brown University</li>
+<li><strong>1993</strong> - MFA, UC San Diego</li>
+<li><strong>2006</strong> - 10-year retrospective at the Tang Museum in Saratoga Springs, NY
+<li><strong>2010</strong> - Artist-in-residence at Dunedin Public Art Gallery, Dunedin, New Zealand</li>
+<li><strong>2013-2016</strong> - Artist-in-residence at the San Francisco Exploratorium</li>
+<li><strong>2015</strong> - Contributed her piece, <em>Accent Elimination</em>, to the Golden-Lion-Award-winning Armenian Pavilion at the Venice Biennale</li>
+</ul>
+</div>
+</div>
+</div>
+
+<!--this row contains the blockquote-->
+<div class="row">
+<div class="small-12 column">
+<blockquote class="lead">[Nina Katchadourian's art] encourages us to 're-see' our surrounding world<cite>Jackie Clay, writing for The Exploratorium</cite></blockquote>
+</div>
+</div>
+
+<!--this row contains the link to more info-->
+<div class="row">
+<div class="small-12 column text-center">
+<h3>Read more about Nina Katchadourian at <a href="http://ninakatchadourian.com/" target="_blank">her website</a> or at <a href="https://cclarkgallery.com/artists/series/nina-katchadourian" target="_blank">Catharine Clark Gallery</a>.</h3>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!--one final row for the byline-->
+<div class="row">
+<div class="small-8 column small-centered text-center">
+<p><small>All form and content authored by CKB using Foundation<br>in the pursuit of FreeCodeCamp's Front End Development Certificate<br><em class="subheader">grey and blue is so drab, don't you think?</em></small</p>
+
+
+</div>
+
+</div>
+</html>
