@@ -3,6 +3,7 @@
 // dependencies
 const express = require('express')
 const app = express()
+const multer = require('multer')
 const path = require('path')
 const request = require('request')
 
@@ -20,22 +21,24 @@ app.use((req, res, next) => {
   // in development allow other origins
   const allowOrigin = process.env.NODE_ENV === 'production' ?
     'http://ckingbailey.com' : '*'
+  console.log('Access-Control-Allow-Origin', allowOrigin);
   res.setHeader('Access-Control-Allow-Origin', allowOrigin)
   res.setHeader('Vary', 'Origin')
   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
   next()
 })
 
-app.use(express.static(pubPath))
-
 app.post('/weather', (req, res) => {
   // probably get weather here instead of returning key to front-end
   // parse req for units, lat, lon
-  const units = 'imperial'
-  const latlon = `lat=${req.body.lat}&lon=${req.body.lon}`
-  const target = `${WEATHER_URL}?APPID=${WEATHER_KEY}&${latlon}&units=imperial`
-  res.set('Content-Type', 'text/plain').send(WEATHER_KEY)
+  console.log(req.body)
+  // const units = 'imperial'
+  // const latlon = `lat=${req.body.lat}&lon=${req.body.lon}`
+  // const target = `${WEATHER_URL}?APPID=${WEATHER_KEY}&${latlon}&units=imperial`
+  res.set('Content-Type', 'text/plain').send(WEATHER_URL)
 })
+
+// app.use(express.static(pubPath))
 
 const listener = app.listen(PORT, () => {
   console.log('Listening on port ' + listener.address().port)
