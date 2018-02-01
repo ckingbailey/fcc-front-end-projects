@@ -1,0 +1,144 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #9ac;
+}
+
+.sky.fog {
+  height: 100%;
+  background-color: inherit;
+}
+
+/*.redline {
+  border-top: 1px solid crimson;
+  border-bottom: 1px solid chartreuse;
+  position: absolute;
+  bottom: 13.85rem;
+  height: .75rem;
+  width: 100%;
+  opacity: .75;
+}*/
+
+.background, .midground, .foreground, .sub, .sup {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+//  animation-name: fog-roll;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  overflow: hidden;
+}
+
+.fog-1, .fog-2, .fog-3 {
+  min-width: 1200px;
+//  overflow: visible;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background-position: bottom left;
+  background-repeat: no-repeat;
+//  animation-name: fog-walk;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.fog-1 {
+  left: -1193px;
+}
+
+.fog-3 {
+  left: 1193px;
+}
+
+.sub {
+  left: 0;
+  bottom: -3.85rem;
+  opacity: .4;
+  animation-duration: 15s;
+  animation-name: fog-roll;
+  
+  .fog-1, .fog-2, .fog-3 {
+    background-image: url('data:image/svg+xml;utf8,<svg width="1200" height="300" xmlns="http://www.w3.org/2000/svg"><path filter="url(#fog-blur)" d="m0,0c49.66667,0 92.33333,44 142,44c50.33333,0 123.66667,-42 174,-42c50,0 81,33 131,33c50,0 107,-29 157,-29c50,0 91,37 141,37c50,0 123,-40 173,-40c50,0 75,35 125,35c50,0 107,-38 157,-38l0,300l-1200,0l0,-300z" fill="#b9c0f0"/><defs><filter height="200%" width="200%" y="-50%" x="-50%" id="fog-blur"><feGaussianBlur stdDeviation="6" in="SourceGraphic"/></filter></defs></svg>');
+    animation-duration: 60s;
+    animation-name: fog-walk;
+  }
+}
+
+.background {
+//  left: 1.5rem;
+  bottom: -4rem;
+  opacity: .4;
+  animation-duration: 7s;
+  animation-name: fog-roll;
+  
+  //this guy may be too overlapped. mess with its timing
+  .fog-1, .fog-2, .fog-3 {
+    background-image: url('data:image/svg+xml;utf8,<svg width="1200" height="300" xmlns="http://www.w3.org/2000/svg"><path filter="url(#fog-blur)" d="m0,0c49.66667,0 92.33333,44 142,44c50.33333,0 123.66667,-42 174,-42c50,0 81,33 131,33c50,0 107,-29 157,-29c50,0 91,37 141,37c50,0 123,-40 173,-40c50,0 75,35 125,35c50,0 107,-38 157,-38l0,300l-1200,0l0,-300z" fill="#bbc9f0"/><defs><filter height="200%" width="200%" y="-50%" x="-50%" id="fog-blur"><feGaussianBlur stdDeviation="5" in="SourceGraphic"/></filter></defs></svg>');
+    animation-duration: 80s;
+    animation-name: fog-walk;
+  }
+}
+
+.midground {
+  left: 0;
+  bottom: -4rem;
+  opacity: .4;
+  animation-duration: 18s;
+  animation-delay: .5s;
+  animation-name: fog-roll;
+  
+  .fog-1, .fog-2, .fog-3 {
+    background-image: url('data:image/svg+xml;utf8,<svg width="1200" height="300" xmlns="http://www.w3.org/2000/svg"><path filter="url(#fog-blur)" d="m0,0c49.66667,0 92.33333,44 142,44c50.33333,0 123.66667,-42 174,-42c50,0 81,33 131,33c50,0 107,-29 157,-29c50,0 91,37 141,37c50,0 123,-40 173,-40c50,0 75,35 125,35c50,0 107,-38 157,-38l0,300l-1200,0l0,-300z" fill="#c0ccf0"/><defs><filter height="200%" width="200%" y="-50%" x="-50%" id="fog-blur"><feGaussianBlur stdDeviation="4" in="SourceGraphic"/></filter></defs></svg>');
+//    animation-duration: 100s;
+  }
+}
+
+.foreground {
+//  left: 2rem;
+  bottom: -4rem;
+  opacity: .4;
+  animation-duration: 21s;
+//  animation-delay: .5s;
+  animation-name: fog-roll;
+  animation-delay: .25s;
+  
+    .fog-1, .fog-2, .fog-3 {
+      background-image: url('data:image/svg+xml;utf8,<svg width="1200" height="300" xmlns="http://www.w3.org/2000/svg"><path filter="url(#fog-blur)" d="m0,0c49.66667,0 92.33333,44 142,44c50.33333,0 123.66667,-42 174,-42c50,0 81,33 131,33c50,0 107,-29 157,-29c50,0 91,37 141,37c50,0 123,-40 173,-40c50,0 75,35 125,35c50,0 107,-38 157,-38l0,300l-1200,0l0,-300z" fill="#c9d0f0"/><defs><filter height="200%" width="200%" y="-50%" x="-50%" id="fog-blur"><feGaussianBlur stdDeviation="3" in="SourceGraphic"/></filter></defs></svg>');
+      animation-duration: 50s;
+      animation-name: fog-walk;
+  }
+}
+
+.sup {
+//  left: -2rem;
+  bottom: -4.25rem;
+  opacity: .4;
+  animation-duration: 9s;
+//  animation-delay: .5s;
+  animation-name: fog-roll;
+  
+  .fog-1, .fog-2, .fog-3 {
+    background-image: url('data:image/svg+xml;utf8,<svg width="1200" height="300" xmlns="http://www.w3.org/2000/svg"><path filter="url(#fog-blur)" d="m0,0c49.66667,0 92.33333,44 142,44c50.33333,0 123.66667,-42 174,-42c50,0 81,33 131,33c50,0 107,-29 157,-29c50,0 91,37 141,37c50,0 123,-40 173,-40c50,0 75,35 125,35c50,0 107,-38 157,-38l0,300l-1200,0l0,-300z" fill="#cce0f0"/><defs><filter height="200%" width="200%" y="-50%" x="-50%" id="fog-blur"><feGaussianBlur stdDeviation="2" in="SourceGraphic"/></filter></defs></svg>');
+    animation-duration: 90s;
+    animation-name: fog-walk;
+  }
+}
+
+@keyframes fog-walk {
+  to{transform: translatex(1200px)}
+}
+
+@keyframes fog-roll {
+  50%{
+    transform: translateY(.5rem);
+    opacity: 0;
+  }
+  100%{
+    transform: translateY(0);
+    opacity: .4;
+  }
+}

@@ -1,0 +1,104 @@
+@import '_colors';
+@import '_cold';
+@import '_clear';
+@import '_clouds';
+@import '_drizzle';
+@import '_fog';
+@import '_hail';
+@import '_hot';
+@import '_hurricane';
+@import '_rain';
+@import '_snow';
+@import '_thunder';
+@import '_tornado';
+@import '_windy';
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: sans-serif;
+  color: $text-color;
+  padding: 0; margin: 0;
+  overflow: hidden;
+  background-color: $main-sky-color;
+}
+
+h1,h2,h3,h4,h5 {
+  margin: 0 0 1rem 0;
+}
+
+.flex-parent {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.flex-container {
+  flex: 1 0 auto;
+  background: darken($container-bg,15%);
+//  border: .1rem solid lighten(yellow, 35%);
+  border-radius: 1.25rem;
+  padding: .25rem;
+  box-sizing: border-box;
+
+  .content-container {
+    border: .1rem solid $container-border;
+    padding: 2rem;
+    border-radius: 1rem;
+    background: $container-bg;
+  }
+}
+
+.switch-container {
+  position: relative;
+}
+
+.switch {
+  height: 1.75rem;
+  width: 1.75rem;
+  border-radius: .5rem;
+  border: .25rem solid $main-sky-color;
+  background-color: darken($main-sky-color, 10%);
+  text-align: center;
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  &:active, &:focus {
+    outline: none;
+  }
+}
+
+@media screen and (max-width:480px) {
+  .flex-container {
+    width: 100%;
+  }
+}
+
+@media screen and (min-width:481px) {
+  .flex-container {
+    width: 30rem;
+  }
+}
+
+/*-_-*-_-*-_-*-_-*-_-*-_-*-_-
+  weather-specific styles
+-_-*-_-*-_-*-_-*-_-*-_-*-_-*/
+
+.sky{
+  position: absolute;
+  top: 0; left: 0;
+  height: 100%; //previously I had this as 120%. interesting. sthing to try.
+  width: 100%;
+  overflow: hidden;
+  z-index: -1;
+
+      .foreground, .midground, .background {
+        position: absolute;
+        width: 100%;
+      }
+}

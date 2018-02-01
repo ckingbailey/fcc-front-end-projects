@@ -1,0 +1,51 @@
+.sky.rain5xx{
+  background-color: #568;
+  height: 100%;
+
+.foreground .rain-drop {
+  background: linear-gradient(0deg, rgba(255,255,255,.6), rgba(102,102,138,0));
+  width: .15rem;
+  height: 3rem;
+  border-radius: .75rem;
+  position: absolute;
+  animation-name: rain-fall-1;
+  animation-duration: 1s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.sky.rain5xx .midground .rain-drop {
+  background: linear-gradient(0deg, rgba(220,220,230,.6), rgba(102,102,138,0));
+  width: .12rem;
+  height: 2.7rem;
+  border-radius: .75rem;
+  position: absolute;
+  animation-name: rain-fall-1;
+  animation-duration: 1.2s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.sky.rain5xx .background .rain-drop {
+  background: linear-gradient(0deg, rgba(200,200,210,.6), rgba(102,102,138,0));
+  width: .1rem;
+  height: 2.5rem;
+  border-radius: .75rem;
+  position: absolute;
+  animation-name: rain-fall-1;
+  animation-duration: 1.4s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes rain-fall-1 {
+  to {transform: translateY(135vh)}
+}
+
+@keyframes rain-fall-2 {
+  to {transform: translateY(150vh)}
+}
+
+@keyframes rain-fall-3 {
+  to {transform: translateY(120vh)}
+}
