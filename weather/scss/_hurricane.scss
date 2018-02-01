@@ -1,0 +1,50 @@
+@import '_colors';
+@import '_rain';
+
+$fall-dur: 1s;
+$fade-dur: .33s;
+$wind-dur: 4s;
+
+.hurricane {
+  @extend .wet;
+
+  .rain-drop {
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+  }
+
+  .foreground {
+    //border: 1px solid teal;
+    //transform-origin: top right;
+    transform: rotate(-35deg);
+    top: -15vh;
+
+    .rain-drop {
+      animation-duration: $fall-dur, $fade-dur, $wind-dur;
+    }
+  }
+
+  .midground {
+    //transform-origin: top right;
+    transform: rotate(-27deg);
+    top: -5vh;
+
+    .rain-drop {
+      animation-duration: $fall-dur + .2s, $fade-dur, $wind-dur;
+    }
+  }
+
+  .background {
+    //border: 1px solid red;
+    //transform-origin: top left;
+    transform: rotate(12deg);
+
+    .rain-drop {
+      animation-duration: $fall-dur + .4s, $fade-dur, $wind-dur;
+    }
+  }
+}
+
+@keyframes wind {
+  to {margin-left: 30vw;}
+}

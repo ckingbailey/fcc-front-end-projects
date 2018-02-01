@@ -1,0 +1,145 @@
+@import '_colors';
+
+$sun-ht: 6rem;
+$ray-ht: 2rem;
+$ray-wd: 3rem;
+$bump-top: -2rem;
+$bump-left: ( $sun-ht - $ray-wd ) / 2;
+$rad: $sun-ht / 2;
+
+.sky.clear800 {
+  $anim-dur: 5s;
+  background-color: $main-sky-color;
+
+  .sun {
+    position: absolute;
+    top: 3rem;
+    right: 10%;
+    border-radius: 50%;
+    //border: 0.25rem solid $main-sky-color;
+    height: $sun-ht;
+    width: $sun-ht;
+    background: radial-gradient(white, $sun-yellow);
+    box-shadow: 0 0 1.5rem 0.5rem $sun-yellow;
+
+    .ray-box {
+      //border: 1px solid rgba(220,30,20,.5);
+      position: absolute;
+      margin: auto;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: $sun-ht;
+
+      .ray {
+        //border-left: 1px solid crimson; border-right: 1px solid teal;
+        background: linear-gradient(to top, rgba(255,255,255,0) 0%, rgba(255,255,255,.8) 50%, rgba(255,255,255,0) 100%);
+        background-position: bottom center;
+        background-repeat: no-repeat;
+        //margin-left: ($sun-ht - $ray-wd)/2;
+        border-radius: 0 0 80% 80%;
+        position: absolute;
+        transform-origin: bottom center;
+        opacity: 0.5;
+        animation: sun-twinkle $anim-dur ease-in-out infinite;
+      }
+
+      .ray1 {
+        height: $ray-ht;
+        width: $ray-wd;
+        transform: rotate(0deg);
+        top: -($ray-ht);
+        left: $bump-left;
+        animation-delay: $anim-dur * 0;
+      }
+
+      .ray2 {
+        height: $ray-ht;
+        width: $ray-wd;
+        transform: rotate(36deg);
+        top: $rad - 2.427rem - $ray-ht;
+        left: $bump-left + 1.763rem;
+        animation-delay: $anim-dur * .5;
+      }
+
+      .ray3 {
+        height: $ray-ht;
+        width: $ray-wd;
+        transform: rotate(calc(2 * 36deg));
+        top: $bump-top + ($rad - .927rem);
+        left: $bump-left + 2.853rem;
+        animation-delay: $anim-dur * .4;
+      }
+
+      .ray4 {
+        height: $ray-ht;
+        width: $ray-wd;
+        transform: rotate(calc(3 * 36deg));
+        top: 2 * ($rad - .927rem) - $ray-ht;
+        left: $bump-left + 2.853rem;
+        animation-delay: $anim-dur * 0;
+      }
+
+      .ray5 {
+        height: $ray-ht;
+        width: $ray-wd;
+        transform: rotate(calc(4 * 36deg));
+        top: $rad + 2.427rem - $ray-ht;
+        left: $bump-left + 1.763rem;
+        animation-delay: $anim-dur * .1;
+      }
+
+      .ray6 {
+        height: $ray-ht;
+        width: $ray-wd;
+        transform: rotate(calc(5 * 36deg));
+        top: $bump-top + 2 * $rad;
+        left: $bump-left;
+        animation-delay: $anim-dur * .3;
+      }
+
+      .ray7 {
+        height: $ray-ht;
+        width: $ray-wd;
+        transform: rotate(calc(6 * 36deg));
+        top: $rad + 2.427rem - $ray-ht;
+        left: $bump-left - 1.763rem;
+        animation-delay: $anim-dur * .4;
+      }
+
+      .ray8 {
+        height: $ray-ht;
+        width: $ray-wd;
+        transform: rotate(calc(7 * 36deg));
+        top: 2 * ($rad - .927rem) - $ray-ht;
+        left: $bump-left - 2.853rem;
+        animation-delay: $anim-dur * .2;
+      }
+
+      .ray9 {
+        height: $ray-ht;
+        width: $ray-wd;
+        transform: rotate(calc(8 * 36deg));
+        top: $bump-top + ($rad - .927rem);
+        left: $bump-left - 2.853rem;
+        animation-delay: $anim-dur * .1;
+      }
+
+      .ray10 {
+        height: $ray-ht;
+        width: $ray-wd;
+        transform: rotate(calc(9 * 36deg));
+        top: $rad - 2.427rem - $ray-ht;
+        left: $bump-left - 1.763rem;
+        animation-delay: $anim-dur * .3;
+      }
+    }
+  }
+}
+
+@keyframes sun-twinkle {
+  0% {opacity: .5;}
+  50% {opacity: .25;}
+  100% {opacity: .5;}
+}

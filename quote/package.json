@@ -1,0 +1,28 @@
+{
+  "name": "random-quote-machine",
+  "version": "1.0.0",
+  "description": "click a button to display a random quote",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "scss": "node-sass scss/style.scss css/style.css"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ckingbailey/random-quote-machine.git"
+  },
+  "keywords": [
+    "nonsense",
+    "quotes",
+    "random-quote"
+  ],
+  "author": "ckb",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ckingbailey/random-quote-machine/issues"
+  },
+  "homepage": "https://github.com/ckingbailey/random-quote-machine#readme",
+  "dependencies": {
+    "node-sass": "^4.5.3"
+  }
+}

@@ -1,0 +1,284 @@
+@import '_colors';
+
+$dur: 3s;
+$fall: 80vh;
+$glide: 85vw;
+$top: 0px;
+$left: -5vw;
+$width: 45px;
+$height: 15px;
+$stem-w: 12px;
+$stem-h: 2px;
+$offset-l: 40px;
+$offset-t: -19px;
+
+$mult-1: .85;
+$mult-2: .6;
+
+html, body {
+  padding: 0;
+  margin: 0;
+}
+
+html, body, .sky {
+  height: 100%;
+  overflow: hidden;
+}
+
+.sky.windy {
+  background-color: $main-sky-color;
+}
+
+/*
+Depending on leaf, rotation, certain minimums:
+min position top = -38px
+*/
+
+.leaf {
+  position: absolute;
+  top: $top;
+  left: $left;
+  transform: rotateX(50deg) rotateY(20deg) rotateZ(40deg);
+  animation: $dur ease-in-out .15s infinite leaf-fall-1;
+  //cubic-bezier(.43,0,.5,1)
+}
+
+.leaf-top {
+  position: relative;
+  bottom: 1px;
+  width: $width;
+  height: $height - 1;
+  background-color: green;
+  border-top-left-radius: 100%;
+  border-top-right-radius: 75%;
+  border-bottom-right-radius: 20%;
+  transform: skew(-35deg);
+}
+
+.leaf-bottom {
+  position: relative;
+  top: 1px;
+  width: $width;
+  height: $height;
+  background-color: green;
+  border-bottom-left-radius: 85%;
+  border-bottom-right-radius: 70%;
+  border-top-right-radius: 20%;
+  transform: skew(35deg);
+}
+
+.leaf-stem {
+  position: relative;
+  left: $width - $stem-w/2 - 1;
+  top: -($height + $stem-h * 2);
+  width: $stem-w;
+  height: $stem-h;
+  border-bottom: 2px solid green;
+  border-right: 3px solid green;
+  border-bottom-right-radius: 50%;
+  border-bottom-left-radius: 50%;
+  transform: rotate(-12deg);
+}
+
+//animation-name
+.leaf:nth-of-type(2n) {
+  animation-name: leaf-fall-2;
+}
+
+.leaf:nth-of-type(3n) {
+  animation-name: leaf-fall-3;
+}
+
+.leaf:nth-of-type(5n+2) {
+  animation-name: leaf-fall-1;
+}
+
+//animation-duration
+.leaf:nth-of-type(3n+1){
+  animation-duration: $dur - .35s;
+}
+
+.leaf:nth-of-type(4n+2){
+  animation-duration: $dur + 1.75s;
+}
+
+//animation-delay
+.leaf:nth-of-type(4n){
+  animation-delay: $dur - 1.85s;
+}
+
+.leaf:nth-of-type(5n){
+  animation-delay: $dur - 3.75s;
+}
+
+.leaf:nth-of-type(5n+1){
+  animation-delay: $dur - .95s;
+}
+
+.leaf:nth-of-type(5n+3){
+  animation-delay: $dur - .4s;
+}
+
+.leaf:nth-of-type(7n){
+  animation-delay: $dur - 2.6s;
+}
+
+//position
+.leaf:nth-of-type(3n+1){
+  left: $left - 13;
+}
+
+.leaf:nth-of-type(2n+1){
+  top: $top + 67;
+  left: $left - 15;
+}
+
+.leaf:nth-of-type(4n){
+  top: $top - 10;
+}
+
+.leaf:nth-of-type(4n+3){
+  top: $top + 5;
+}
+
+.leaf:nth-of-type(5n+2){
+  left: $left - 12;
+}
+
+.leaf:nth-of-type(5n+3){
+  top: $top - 5;
+}
+
+//size
+.leaf:nth-of-type(3n+1) {
+  .leaf-top {
+    height: $height * $mult-2;
+    width: $width * $mult-1;
+    bottom: 0;
+  }
+  .leaf-bottom {
+    height: $height * $mult-2;
+    width: $width * $mult-1;
+  }
+  .leaf-stem {
+    left: ($width * $mult-1) - $stem-w/2 - 1;
+    top: -($height * $mult-2 + $stem-h * 2);
+    width: $stem-w * $mult-1;
+    height: $stem-h * $mult-2;
+  }
+}
+
+.leaf:nth-of-type(4n+2) {
+  .leaf-top {
+    height: $height * $mult-1 - 1;
+    width: $width * $mult-2 - 1;
+    bottom: 0;
+  }
+  .leaf-bottom {
+    height: $height * $mult-1;
+    width: $width * $mult-2;
+  }
+  .leaf-stem {
+    left: ($width * $mult-2) - $stem-w/2;
+    top: -($height * $mult-1 + $stem-h * 2 - 1);
+    width: $stem-w * $mult-2;
+    height: $stem-h * $mult-2;
+  }
+}
+
+//color
+.leaf:nth-of-type(3n+2) * {
+  background-color: darkGreen;
+  border-color: darkGreen;
+}
+
+.leaf:nth-of-type(4n+1) * {
+  background-color: darkOliveGreen;
+  border-color: darkOliveGreen;
+}
+
+.leaf:nth-of-type(6n-3) * {
+  background-color: seaGreen;
+  border-color: seaGreen;
+}
+
+//variance for wind types
+.leaf.lo{
+  animation-duration: $dur + 1;
+}
+
+.leaf.lo:nth-of-type(3n+1){
+  animation-duration: $dur + .65s;
+}
+
+.leaf.lo:nth-of-type(4n+2){
+  animation-duration: $dur + 2.75s;
+}
+
+.leaf.hi{
+  animation-duration: $dur - 1;
+}
+
+.leaf.hi:nth-of-type(3n+1){
+  animation-duration: $dur - 1.35s;
+}
+
+.leaf.hi:nth-of-type(4n+2){
+  animation-duration: $dur + .75s;
+}
+@keyframes leaf-fall-1 {
+  0% {
+    margin-top: 0;
+    margin-left: 0;
+    opacity: 1;
+  }
+  50% {
+    margin-top: 60vh;
+    transform: rotateX(70deg) rotateY(-10deg) rotateZ(15deg);
+    opacity: .8;
+  }
+  100% {
+    margin-top: $fall;
+    margin-left: $glide;
+    transform: rotateX(25deg) rotateY(66deg) rotateZ(35deg);
+    opacity: 0;
+  }
+}
+
+@keyframes leaf-fall-2 {
+  0% {
+    margin-top: -1vh;
+    margin-left: 0;
+    opacity: 1;
+  }
+  50% {
+    margin-top: $fall - 25;
+    transform: rotateX(85deg) rotateY(-10deg) rotateZ(15deg);
+    opacity: .8;
+  }
+  100% {
+    margin-top: $fall + 8;
+    margin-left: $glide - 9;
+    transform: rotateX(25deg) rotateY(26deg) rotateZ(35deg);
+    opacity: 0;
+  }
+}
+
+@keyframes leaf-fall-3 {
+  0% {
+    margin-top: 0;
+    margin-left: -2vw;
+    opacity: 0;
+  }
+  50% {
+    margin-top: $fall - 60;
+    transform: rotateX(110deg) rotateY(-10deg) rotateZ(-5deg);
+    opacity: .8;
+  }
+  100% {
+    margin-top: $fall - 10;
+    margin-left: $glide + 27;
+    transform: rotateX(35deg) rotateY(25deg) rotateZ(15deg);
+    opacity: 0;
+  }
+}

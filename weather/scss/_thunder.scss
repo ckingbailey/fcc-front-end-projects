@@ -1,0 +1,117 @@
+@import '_colors';
+
+.sky.thunder2xx {
+  background-color: $rain-sky-color;
+  height: 100%;
+
+
+  .background {
+    background-color: lighten($rain-sky-color, 5%);
+    height: 7.5rem;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .midground {
+    background-color: transparent;
+    height: 7.5rem;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .foreground {
+    background-color: lighten($rain-sky-color, 10%);
+    height: 5rem;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .lightning {
+    position: absolute;
+    top: 3rem;
+    left: 1rem;
+    height: 4.5rem;
+    width: 40vw;
+    border-radius: 50%;
+    background-image: radial-gradient(rgba(204, 204, 187, 0), rgba(153, 136, 153, 0) 35%);
+    /*transform: scaleY(0);*/
+    animation: lightning 3.8s ease-in-out infinite;
+
+    &:before {
+      content: '';
+      background-image: inherit;
+      position: absolute;
+      top: 0;
+      left: 2rem;
+      width: 17vw;
+      height: 4rem;
+      animation: lightning 3.8s ease-in-out infinite;
+      animation-delay: .5s;
+    }
+
+    &:after {
+      content: '';
+      background-image: inherit;
+      position: absolute;
+      top: 0;
+      left: 18rem;
+      width: 20vw;
+      height: 4rem;
+      animation: lightning 3.8s ease-in-out infinite;
+      animation-delay: .75s;
+    }
+  }
+
+  .puff {
+    border-radius: 50%;
+    background-color: inherit;
+    position: absolute;
+    /*bottom: -1rem;*/
+    height: 2rem;
+  }
+}
+
+@keyframes lightning {
+  0% {
+    background-image: radial-gradient(rgba(204, 204, 187, 0), rgba(204, 204, 187, 0) 45%);
+    opacity: 0;
+  }
+  25% {
+    background-image: radial-gradient(rgba(204, 204, 187, 0), rgba(204, 204, 187, 0) 45%);
+    opacity: 0;
+  }
+  30% {
+    background-image: radial-gradient(rgba(204, 204, 187, 1), rgba(204, 204, 187, 0) 45%);
+    opacity: 1;
+  }
+  32% {
+    background-image: radial-gradient(rgba(204, 204, 187, 0), rgba(204, 204, 187, 0) 45%);
+    opacity: 0;
+  }
+  34% {
+    background-image: radial-gradient(rgba(204, 204, 187, 1), rgba(204, 204, 187, 0) 45%);
+    opacity: 1;
+  }
+  36% {
+    background-image: radial-gradient(rgba(204, 204, 187, 0), rgba(204, 204, 187, 0) 45%);
+    opacity: 0;
+  }
+  40% {
+    background-image: radial-gradient(rgba(204, 204, 187, 1), rgba(204, 204, 187, 0) 45%);
+    opacity: 1;
+  }
+  75% {
+    background-image: radial-gradient(rgba(204, 204, 187, 1), rgba(204, 204, 187, 0) 45%);
+    opacity: 0;
+  }
+  100% {
+    background-image: radial-gradient(rgba(204, 204, 187, 0), rgba(204, 204, 187, 0) 45%);
+    opacity: 0;
+  }
+}

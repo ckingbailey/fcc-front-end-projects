@@ -1,0 +1,70 @@
+html {
+  height: 100%;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.sky.snow6xx{
+  background-color: #679;
+  height: 100%;
+}
+
+.foreground, .midground, .background {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.sky.snow6xx .foreground .snow-flake {
+  position: absolute;
+  height: .25rem;
+  width: .25rem;
+  background: #fff;
+  box-shadow: 0 0 .25rem .1rem #fff;
+  animation-name: snow-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-direction: normal;
+}
+
+.sky.snow6xx .midground .snow-flake {
+  position: absolute;
+  height: .2rem;
+  width: .2rem;
+  background: #fff;
+  opacity: .6;
+  box-shadow: 0 0 .2rem .1rem #fff;
+  animation-name: snow-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-direction: normal;
+}
+
+.sky.snow6xx .background .snow-flake {
+  position: absolute;
+  height: .15rem;
+  width: .15rem;
+  background: #fff;
+  opacity: .45;
+  box-shadow: 0 0 .15rem .1rem #fff;
+  animation-name: snow-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-direction: normal;
+}
+
+@keyframes snow-fall {
+  to {
+    margin-top: 110vh;
+    /*transform: translateX(-7vw);*/
+  }
+}
+
+@keyframes snow-drift-1 {
+  100%{transform: translateX(3vw)}
+}

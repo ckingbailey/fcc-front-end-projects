@@ -1,0 +1,41 @@
+{
+  "name": "local-weather-app",
+  "version": "1.0.0",
+  "description": "display local weather based on your IP address",
+  "main": "app.js",
+  "dependencies": {},
+  "devDependencies": {
+    "babel-core": "^6.25.0",
+    "babel-loader": "^7.1.1",
+    "babel-preset-env": "^1.6.0",
+    "eslint": "^4.2.0",
+    "gulp": "^3.9.1",
+    "node-sass": "^4.5.2",
+    "webpack": "^2.5.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "bundle": "webpack --config webpack.config.js",
+    "sass": "node-sass scss/style.scss css/style.css",
+    "build-test": "webpack --entry ./test/test.js --output-path ./test --output-filename test-app.js",
+    "lint": "eslint ./js/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ckingbailey/local-weather-app.git"
+  },
+  "keywords": [
+    "weather",
+    "local-weather",
+    "free-code-camp",
+    "open-weather-map",
+    "freecodecamp.com",
+    "openweathermap.org"
+  ],
+  "author": "CKB",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ckingbailey/local-weather-app/issues"
+  },
+  "homepage": "https://github.com/ckingbailey/local-weather-app#readme"
+}

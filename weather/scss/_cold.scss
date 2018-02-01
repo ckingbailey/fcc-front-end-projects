@@ -1,0 +1,5 @@
+@import '_colors';
+
+.sky.cold903 {
+  background-image: linear-gradient(to top, mix($snow-sky-color,blue,70%), $snow-sky-color 30%, white);
+}

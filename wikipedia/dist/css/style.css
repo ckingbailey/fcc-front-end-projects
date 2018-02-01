@@ -1,0 +1,73 @@
+@media screen and (min-width: 980px) {
+  .column-sizer, .card {
+    width: 20%;
+  }
+  .leadArticle {
+    width: 40%;
+  }
+}
+
+@media screen and (max-width: 979px) {
+  .column-sizer, .card {
+    width: 50%;
+  }
+  .leadArticle {
+    width: 100%;
+  }}
+
+@media screen and (max-width: 500px) {
+  .column-sizer, .card {
+    width: 100%;
+  }
+  .card.leadArticle {
+    background-color: lavenderBlush;
+  }
+}
+
+.leadArticle {
+  z-index: 2;
+}
+
+.leadArticle .imgWrap {
+  text-align: center;
+}
+
+.card {
+  box-sizing: border-box;
+  display: inline-block;
+  background-color: azure;
+  padding: 1rem;
+  border: 1px solid grey;
+  border-radius: 2px;
+  box-shadow: 1px 2px 5px grey;
+}
+
+.card a {
+  margin-bottom: 1rem;
+}
+
+.forms form {
+  vertical-align: top;
+}
+
+form {
+  display: inline-block;
+  margin: 1rem;
+}
+
+.imgWrap {
+  overflow: hidden;
+}
+
+#search-form {
+  width: 80%;
+}
+
+#search-field {
+  width: 80%;
+  line-height: 1.5rem;
+}
+
+#random-page {
+  line-height: 1.5rem;
+}

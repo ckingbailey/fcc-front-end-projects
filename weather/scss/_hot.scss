@@ -1,0 +1,5 @@
+@import '_colors';
+
+.sky.hot904 {
+  background-image: linear-gradient(to top, mix($sun-yellow,#ff4500,20%), mix($sun-yellow, #ff4500) 20%, lighten($sun-yellow,15%));
+}
