@@ -1,0 +1,27 @@
+{
+  "name": "ckb-portfolio",
+  "version": "0.1.0",
+  "description": "ckb's Internet portfolio",
+  "main": "index.html",
+  "dependencies": {
+    "milligram": "^1.3.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ckingbailey/portfolio-page.git"
+  },
+  "keywords": [
+    "ckb",
+    "portfolio"
+  ],
+  "author": "ckb",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ckingbailey/portfolio-page/issues"
+  },
+  "homepage": "https://github.com/ckingbailey/portfolio-page#readme"
+}

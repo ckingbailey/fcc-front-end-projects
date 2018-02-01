@@ -1,0 +1,78 @@
+/*----------------------------------
+this here is the header and stuff
+-----------------------------------*/
+.header {
+  text-align: center;
+  background: #135;
+  background-size: cover;
+  position: relative;
+  overflow: visible;
+  margin: 0 0 .5rem;
+  padding-top: 2.5rem;
+  padding-bottom: 4.9rem; }
+  .header .headline {
+    position: relative;
+    color: #ffe; }
+    .header .headline h1 {
+      font-weight: bold; }
+    .header .headline small {
+      color: #ddb; }
+  .header .header-bg {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    padding-bottom: 16.05rem;
+    background: url("https://upload.wikimedia.org/wikipedia/commons/1/1c/OaklandPanorama2.140510.jpg") no-repeat center center;
+    background-size: cover;
+    opacity: 0.6; }
+
+.header-subnav {
+  float: none;
+  position: absolute;
+  text-align: center;
+  margin: 0 auto;
+  bottom: 0;
+  width: 100%; }
+  .header-subnav li {
+    float: none;
+    display: inline-block; }
+    .header-subnav li a {
+      padding: 0.9rem 1rem;
+      font-size: 0.75rem;
+      color: #ffe;
+      text-transform: uppercase;
+      display: block;
+      font-weight: bold;
+      letter-spacing: 1px;
+      transition: all 0.1s ease-in-out; }
+      .header-subnav li a.is-active {
+        background: rgba(250, 250, 250, 0.1); }
+      .header-subnav li a:hover {
+        background: rgba(250, 250, 250, 0.1);
+        transition: all 0.1s ease-in-out; }
+
+/*-------------------------------------
+a rule or two for content sections
+--------------------------------------*/
+h2.section-heading {
+  margin-top: 1rem; }
+
+.callout.primary {
+  background: rgba(50, 50, 255, 0.1); }
+
+/*-------------------------------------
+and this here is the footer and stuff
+--------------------------------------*/
+.footer {
+  margin-top: 2.5rem;
+  border-top: 1rem solid #4a4a3e;
+  background-color: #333328;
+  text-align: center;
+  font-size: 1.2rem;
+  padding: 4rem; }
+  .footer p.copyright {
+    color: #8ab;
+    font-size: 0.875rem;
+    margin: 0; }
+
+/*# sourceMappingURL=sectionstyles.css.map */

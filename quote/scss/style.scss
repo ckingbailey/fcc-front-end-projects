@@ -1,0 +1,259 @@
+/*-_-*-_-*-_-*-_-*-_-*-_-*-_-*-_-*-_-
+a bunch of variables for layout
+-_-*-_-*-_-*-_-*-_-*-_-*-_-*-_-*-_-*/
+
+$q-c-pad-t-b: 1.25rem;
+$q-c-pad-l-r: 1.5rem;
+$q-c-pad: $q-c-pad-t-b $q-c-pad-l-r;
+$q-c-flex-base: 17rem;
+$q-c-h: 7rem;
+$q-c-bord-rad: .5rem .5rem 0 .5rem;
+
+$b-c-pad-t-b: 2.5rem;
+$b-c-pad-l-r: 2.5rem;
+$b-c-max-w: $q-c-flex-base + (2 * $q-c-pad-l-r);
+$btn-pad-l-r: .5rem;
+
+$m-c-width: $q-c-pad-l-r + $q-c-flex-base + $b-c-pad-l-r + $btn-pad-l-r;
+
+$ani-box-pos-t: .5rem;
+$ani-box-pos-l: .5rem;
+$ani-box-w: $q-c-flex-base + ($q-c-pad-l-r * 2) - ($ani-box-pos-l * 2);
+$ani-box-h: $q-c-h + ($q-c-pad-t-b * 2) - ($ani-box-pos-t * 2);
+
+/*-_-*-_-*-_-*-_-*-_-*-_-*-_-*-_-*-_
+and variables for colors
+-_-*-_-*-_-*-_-*-_-*-_-*-_-*-_-*-_-*/
+
+$main-color: darkBlue;
+
+$bg-color1: lemonChiffon;
+$bg-color2: khaki;
+$bg-color3: #f99;
+$bg-grad: linear-gradient($bg-color1, $bg-color2 70%, $bg-color3);
+
+$mc-bord-color1: #6f9;
+$mc-bord-color2: #39b;
+$mc-bord: linear-gradient($mc-bord-color1, $mc-bord-color2);
+
+$wo-color1: lighten($mc-bord-color1,20%);
+$wo-color2: lighten(yellow,45%);
+$wo-border: .15rem solid $wo-color2;
+$wo-shadow: 0 0 .5rem .5rem $wo-color2;
+
+body {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 0;
+  font-family: sans-serif;
+  color: $main-color;
+  height: 100%;
+  background: $bg-color3;
+}
+
+/*-_-*-_-*-_-*-_-*-_-*-_-*-_-*-_-*-_-*-_-*-_-*-_-*-_-*
+ This container exists only for the purpose of stretching a color gradient background to the full size of the viewport regardless of page content
+_-*-_-*-_-*-_-*-_-*-_-*-_-*-_-*-_-*-_-*-_-*-_-*-_-*-_-*/
+.bg-container {
+  
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-height: 100%;
+  height: 100%;
+  background: $bg-grad;
+  z-index: -2;
+  
+}
+
+/*@media handheld and (max-width:480px), handheld and (orientation: landscape){
+  .flex-mama{
+    flex: 0 0 auto;
+    width: 100%;
+  }
+}
+
+@media screen and (min-width:481px){
+  .flex-mama{
+    flex: 0 0 auto;
+    width: fit-content;
+  }
+}*/
+
+.flex-mama {
+  
+  flex: 0 0 auto;
+//  display: flex;
+//  flex-flow: column;
+//  justify-content: space-around;
+  border-radius: 0 1rem 0 1rem;
+  background: $mc-bord;
+  padding: 1rem;
+//  height: max-content;
+  width: fit-content;
+  margin-left: auto; margin-right: auto;
+  box-shadow: 0 .1rem .5rem darkBlue;
+  
+}
+
+.main-container {
+  
+  width: fit-content;
+//  flex: 0 1 auto;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-start;
+  padding: .25rem .25rem 0 0;
+  border-radius: 0 .5rem 0 .5rem;
+  background: linear-gradient(#fc109c, #483d8b);
+}
+
+.quote-container {
+  
+  position: relative;
+  width: $q-c-flex-base;
+//  display: inline-block;
+  flex: 0 0 auto;
+  margin-bottom: .25rem; margin-left: .25rem;
+  padding: $q-c-pad;
+  background: #e9e9ff;
+  border-radius: $q-c-bord-rad;
+  height: $q-c-h;
+  z-index: 1;
+  
+//  transition: background 1s ease-in;
+    
+  q{
+    
+    &::before{
+    content: "\0022";
+    }
+
+    &::after{
+      content: "\0022";
+    }
+  }
+  
+  .tweet-box{
+
+  position: absolute;
+  bottom: 1rem;
+  right: 1.5rem;
+    
+    a {
+      
+      font-size: small;
+      text-decoration: none;
+      
+    }
+
+  }
+  
+  cite{
+    display: inline-block;
+    width: 100%;
+    text-align: right;
+        
+    &::before {
+    content: "\A\A\2014\0020";
+    white-space: pre;
+    }
+  }
+}
+
+.button-container {
+  flex: 1 0 auto;
+  max-width: $b-c-max-w;
+  box-sizing: border-box;
+  display: flex;
+  flex-flow: row;
+  justify-content: center;
+  align-items: center;
+//  margin: $b-c-marg-t-b $b-c-marg-r $b-c-marg-t-b $b-c-marg-l;
+  margin-bottom: .25rem; margin-left: .25rem;
+  padding: 2.5rem;
+  background: #e9e9ff;
+  border-radius: 0 .5rem .5rem .5rem;
+  z-index: 1;
+  
+  button{
+    flex: none;
+    padding: 1rem .5rem;
+    box-shadow: none;
+    border: none;
+    border-radius: .25rem;
+    color: lighten(darkBlue, 70%);
+    font-weight: 700;
+    background: #ff1493;
+    
+    &:focus{
+      border: none;
+      outline: none;
+      box-shadow: none;
+    }
+    
+    &:hover{
+      
+      box-shadow: 0 0 .125rem .125rem #1b95e0;
+      
+    }
+    
+    &:active{
+      
+      box-shadow: inset .025rem .05rem .15rem dodgerBlue;
+      background: #e00890;
+      background: #e00890;
+      color: lighten(darkBlue, 65%);
+    }
+    
+  }
+}
+
+.whiteOut {
+  
+  color: white;
+  background: $wo-color1;
+  box-shadow: $wo-shadow;
+//  opacity: 1;
+//  transition: background 1s cubic-bezier(.85,.05,.65,.99);
+  transition: all 1s cubic-bezier(.3,.01,.35,1); 
+  
+}
+
+/*.woRadBeg {
+  
+  background: radial-gradient(rgba(250,250,255,1) 30%, rgba(255,255,255,0));
+  opacity: 0;
+  
+}
+
+.woRadEnd {
+  
+  background: radial-gradient(rgba(250,250,255,1) 30%, rgba(255,255,255,0));
+  opacity: 1;
+  
+}*/
+
+.animate {
+  
+  box-sizing: border-box;
+  width: $ani-box-w;
+  height: $ani-box-h;
+  border-radius: $q-c-bord-rad;
+//  padding-bottom: 100%;
+//  padding-left: 50%; padding-right: 50%;
+  position: absolute;
+  top: $ani-box-pos-t; left: $ani-box-pos-l;
+  z-index: 2;
+  
+  span {
+  
+    display: none;
+//    color: transparent;
+    
+  }
+  
+}
