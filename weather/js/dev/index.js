@@ -9,7 +9,7 @@ import snow from './weather/snow';
 import thunder from './weather/thunder';
 import tornado from './weather/tornado';
 import animateWeather from './weather/animateWeather';
-import {temperature, requestWeather, getLocalWeather} from './ajax/fetchAPIs';
+import {temperature, requestWeather, getLocalWeather} from './ajax/getWeather';
 import convert, {unitsBtn} from './utils/conversion';
 
 getLocalWeather('http://ip-api.com/json', requestWeather);
