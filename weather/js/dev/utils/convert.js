@@ -6,7 +6,7 @@ export default function convert() {
   var f;
   var temp = document.querySelector('.temp');
   var unitsBtn = document.querySelector('./switch');
-  if (temp.classList.includes('degF')) {
+  if (temp.classList.contains('degF')) {
     c = Math.round((temperature - 32) * 5 / 9);
     temp.classList.remove('degF');
     temp.classList.add('degC');
