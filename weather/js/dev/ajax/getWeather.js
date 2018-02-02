@@ -1,5 +1,7 @@
 import superagent from 'superagent';
 
+export var temperature;
+
 // build query url and request AJAX
 export function getWeather(loc, fcn) {
   // TODO: use IDs instead of classes to grab these elements
@@ -19,7 +21,8 @@ export function getWeather(loc, fcn) {
         // TODO: add `error` class to element & style it
         temp.innerText = 'There was a problem with the weather request<br>' + err;
       } else if (res.ok) {
-        temp.innerText = Math.round(res.main.temp) + '\xb0 F';
+        temperature = Math.round(res.main.temp);
+        temp.innerText = temperature + '\xb0 F';
         temp.classList.add('degF');
         description.innerText = res.weather[0].description;
         fcn(res.weather[0].id);
