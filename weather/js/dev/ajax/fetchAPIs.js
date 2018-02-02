@@ -1,5 +1,4 @@
-import randomInt from '../utils/randomRolls';
-import randomFlt from '../utils/randomRolls';
+import { randomInt, randomFlt } from '../utils/randomRolls';
 import clouds from '../weather/clouds';
 import drizzle from '../weather/drizzle';
 import fog from '../weather/fog';
