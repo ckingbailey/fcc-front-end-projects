@@ -4,35 +4,25 @@ import superagent from 'superagent';
 export var temperature;
 
 // build query url and request AJAX
-export function requestWeather(loc) {
-// building the uri weather query string
-  var url = 'http://api.openweathermap.org/data/2.5/weather?';
-  var lat = 'lat=' + loc.lat.toString().slice(0, loc.lat.toString().indexOf('.') + 3);
-  var lon = 'lon=' + loc.lon.toString().slice(0, loc.lon.toString().indexOf('.') + 3);
-
+export function getWeather(loc, fcn) {
+  // TODO: use IDs instead of classes to grab these elements
+  var temp = document.querySelector('.temp');
+  var description = document.querySelector('weather');
   // AJAX weather request
-  // this should use fetch instead
-  $.ajax({
-    // this fcn now makes post request, sends lat&lon, receives weather back
-    url: url,
-    type: 'GET',
-    dataType: 'jsonp',
-    // success function
-    success: function publishWeather(api) {
-      temperature = Math.round(api.main.temp);
-      console.log("rounded 'temperature' = ", temperature);
-      $('.temp').text(temperature + '\xb0 F').addClass('degF');
-      $('.weather').text(api.weather[0].description);
-      console.log(api);
-      animateWeather(api.weather[0].id);
-    },
-    xhrField: {
-      withCredentials: true
-    },
-    error: function(api, errorText) {
-      $('.temp').text('There was a problem with the weather request<br>' + errorText);
-    }
-  });
+  superagent('GET', 'https://sheltered-dusk-25569.herokuapp.com/')
+    .end((err, res) => {
+      if (err) {
+        console.error(err);
+        // TODO: make this use `description` element instead of `temp`
+        // TODO: add `error` class to element & style it
+        temp.innerText = 'There was a problem with the weather request<br>' + err;
+      } else if (res.ok) {
+        temp.innerText = Math.round(res.main.temp) + '\xb0 F';
+        temp.classList.add('degF');
+        description.innerText = res.weather[0].description;
+        fcn(res.weather[0].id);
+      }
+    });
 }
 
 /*
@@ -40,20 +30,17 @@ export function requestWeather(loc) {
  then fire location-dependent fcns
  such as get weather fcn
 */
-export function getLocalWeather(locURL, weatherFcn) {
-  $.ajax({
-    url: locURL,
-    type: 'GET',
-    dataType: 'jsonp',
-    success: function(json) {
-      $('.locale').text(json.city + ', ' + json.regionName + ' ' + json.zip + ', ' + json.country);
-      weatherFcn(json);
-    },
-    xhrField: {
-      withCredentials: true
-    },
-    error: function(json, errorText) {
-      $('.locale').text('There was a problem with the location request: ', errorText);
-    }
-  });
+export function getLocation(locAPI, fcn) {
+  var locale = document.querySelector('.locale');
+  var temp = document.querySelector('.temp');
+  superagent('GET', locAPI)
+    .end((err, res) => {
+      if (err) {
+        console.error(err);
+        temp.innerText = 'There was a problem with the location request: ' + err;
+      } else if (res.ok) {
+        locale.innerText = res.city + ', ' + res.regionName + ' ' + res.zip + ', ' + res.country;
+        fcn(res);
+      }
+    });
 }
