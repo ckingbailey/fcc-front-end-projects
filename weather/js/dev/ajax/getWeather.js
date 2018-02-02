@@ -1,7 +1,5 @@
 import superagent from 'superagent';
 
-export var temperature;
-
 // build query url and request AJAX
 export function getWeather(loc, fcn) {
   // TODO: use IDs instead of classes to grab these elements

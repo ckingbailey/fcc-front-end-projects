@@ -16,14 +16,14 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "bundle": "webpack --config webpack.config.js",
-    "sass": "node-sass scss/style.scss css/style.css",
+    "build": "webpack --config webpack.config.js",
+    "build-sass": "node-sass scss/style.scss css/style.css",
     "build-test": "webpack --entry ./test/test.js --output-path ./test --output-filename test-app.js",
     "lint": "eslint ./js/"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ckingbailey/local-weather-app.git"
+    "url": "git+https://github.com/ckingbailey/fcc-front-end-projects.git"
   },
   "keywords": [
     "weather",
@@ -36,9 +36,9 @@
   "author": "CKB",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/ckingbailey/local-weather-app/issues"
+    "url": "https://github.com/ckingbailey/fcc-front-end-projects/issues"
   },
-  "homepage": "https://github.com/ckingbailey/local-weather-app#readme",
+  "homepage": "https://github.com/ckingbailey/fcc-front-end-projects#readme",
   "eslintConfig": {
     "rules": {
       "semi": 0,
