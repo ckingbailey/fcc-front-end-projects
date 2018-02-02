@@ -21,8 +21,7 @@ const pubPath = path.resolve(__dirname, 'public')
 
 app.use((req, res, next) => {
   // in development allow other origins
-  const allowOrigin = process.env.NODE_ENV === 'production' ?
-    'http://ckingbailey.com' : '*'
+  const allowOrigin = '*'
   console.log('Access-Control-Allow-Origin', allowOrigin);
   res.setHeader('Access-Control-Allow-Origin', allowOrigin)
   res.setHeader('Vary', 'Origin')
