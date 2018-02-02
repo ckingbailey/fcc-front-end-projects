@@ -36,5 +36,11 @@
   "bugs": {
     "url": "https://github.com/ckingbailey/local-weather-app/issues"
   },
-  "homepage": "https://github.com/ckingbailey/local-weather-app#readme"
+  "homepage": "https://github.com/ckingbailey/local-weather-app#readme",
+  "eslintConfig": {
+    "rules": {
+      "semi": 0,
+      "space-before-function-paren": 0
+    }
+  }
 }
