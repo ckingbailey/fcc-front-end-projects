@@ -1,9 +1,9 @@
 import animateWeather from '../weather/animateWeather';
+import superagent from 'superagent';
 
 export var temperature;
 
 // build query url and request AJAX
-
 export function requestWeather(loc) {
 // building the uri weather query string
   var url = 'http://api.openweathermap.org/data/2.5/weather?';

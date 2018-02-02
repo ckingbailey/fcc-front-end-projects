@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "display local weather based on your IP address",
   "main": "app.js",
-  "dependencies": {},
+  "dependencies": {
+    "superagent": "^3.8.2"
+  },
   "devDependencies": {
     "babel-core": "^6.25.0",
     "babel-loader": "^7.1.1",
