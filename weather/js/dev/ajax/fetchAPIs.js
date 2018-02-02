@@ -17,7 +17,6 @@ export var temperature;
 export function requestWeather(loc){
 // building the uri weather query string
   var url = "http://api.openweathermap.org/data/2.5/weather?",
-      key = "&units=imperial&APPID=79aef489883f75aff91f8900796eb1ea",
       lat = "lat=" + loc.lat.toString().slice(0,loc.lat.toString().indexOf(".")+3),
       lon = "lon=" + loc.lon.toString().slice(0,loc.lon.toString().indexOf(".")+3);
 

@@ -1,0 +1,47 @@
+{
+  "name": "fcc-front-end-projects",
+  "version": "0.0.1",
+  "description": "monorepo for ckb's freecodecamp frontend projects",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server",
+    "devstart": "nodemon server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ckingbailey/fcc-front-end-projects.git"
+  },
+  "keywords": [
+    "fcc",
+    "freecodecamp",
+    "frontend",
+    "front-end",
+    "student",
+    "student-projects",
+    "js",
+    "javascript",
+    "css",
+    "html"
+  ],
+  "author": "ckb",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ckingbailey/fcc-front-end-projects/issues"
+  },
+  "homepage": "https://github.com/ckingbailey/fcc-front-end-projects#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "dotenv": "^5.0.0",
+    "express": "^4.16.2",
+    "nodemon": "^1.14.11",
+    "request": "^2.83.0"
+  },
+  "devDependencies": {
+    "eslint": "^4.16.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-standard": "^3.0.1"
+  }
+}
