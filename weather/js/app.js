@@ -145,7 +145,7 @@ function getLocation(locAPI, fcn) {
       console.error(err);
       temp.innerText = 'There was a problem with the location request: ' + err;
     } else if (res.ok) {
-      locale.innerText = res.city + ', ' + res.regionName + ' ' + res.zip + ', ' + res.country;
+      locale.innerText = res.body.city + ', ' + res.body.regionName + ' ' + res.body.zip + ', ' + res.body.country;
       fcn(res.body);
     } else {
       console.warn(res.status);
