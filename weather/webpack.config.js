@@ -12,5 +12,10 @@ module.exports = {
         exclude: /node_modules/,
         loader: 'babel-loader' }
     ]
+  },
+  watch: true,
+  watchOptions: {
+    aggregateTimeout: 900,
+    poll: 2000
   }
 };

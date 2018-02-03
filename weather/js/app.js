@@ -108,22 +108,23 @@ var temperature = exports.temperature = undefined;
 function getWeather(loc, fcn) {
   // TODO: use IDs instead of classes to grab these elements
   var temp = document.querySelector('.temp');
-  var description = document.querySelector('weather');
+  var description = document.querySelector('.weather');
   var lat = 'lat=' + loc.lat.toString().slice(0, loc.lat.toString().indexOf('.') + 3);
   var lon = 'lon=' + loc.lon.toString().slice(0, loc.lon.toString().indexOf('.') + 3);
   // AJAX weather request
-  (0, _superagent2.default)('POST', 'https://sheltered-dusk-25569.herokuapp.com/').set('Content-Type', 'x-www-form-urlencoded').send(lat).send(lon).end(function (err, res) {
+  (0, _superagent2.default)('POST', 'https://sheltered-dusk-25569.herokuapp.com/weather').set('Content-Type', 'application/x-www-form-urlencoded').send(lat).send(lon).end(function (err, res) {
     if (err) {
       console.error(err);
       // TODO: make this use `description` element instead of `temp`
       // TODO: add `error` class to element & style it
-      temp.innerText = 'There was a problem with the weather request<br>' + err;
+      temp.innerHTML = 'There was a problem with the weather request<br>' + err;
     } else if (res.ok) {
-      exports.temperature = temperature = Math.round(res.main.temp);
+      console.log(res);
+      exports.temperature = temperature = Math.round(res.body.main.temp);
       temp.innerText = temperature + '\xb0 F';
       temp.classList.add('degF');
-      description.innerText = res.weather[0].description;
-      fcn(res.weather[0].id);
+      description.innerText = res.body.weather[0].description;
+      fcn(res.body.weather[0].id);
     } else {
       console.warn(res.status);
       temp.innerText = 'There was a problem with the weather request';
@@ -139,15 +140,13 @@ function getWeather(loc, fcn) {
 function getLocation(locAPI, fcn) {
   var locale = document.querySelector('.locale');
   var temp = document.querySelector('.temp');
-  console.log('salient data for getLocation:', locale, temp, fcn);
   (0, _superagent2.default)('GET', locAPI).end(function (err, res) {
     if (err) {
       console.error(err);
       temp.innerText = 'There was a problem with the location request: ' + err;
     } else if (res.ok) {
       locale.innerText = res.city + ', ' + res.regionName + ' ' + res.zip + ', ' + res.country;
-      console.log('location response:', res);
-      fcn(res);
+      fcn(res.body);
     } else {
       console.warn(res.status);
       temp.innerText = 'There was a problem with the location request';
