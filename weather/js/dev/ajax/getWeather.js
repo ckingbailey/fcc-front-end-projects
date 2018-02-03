@@ -41,6 +41,7 @@ export function getWeather(loc, fcn) {
 export function getLocation(locAPI, fcn) {
   var locale = document.querySelector('.locale');
   var temp = document.querySelector('.temp');
+  console.log('salient data for getLocation:', locale, temp, fcn)
   superagent('GET', locAPI)
     .end((err, res) => {
       if (err) {
@@ -48,7 +49,8 @@ export function getLocation(locAPI, fcn) {
         temp.innerText = 'There was a problem with the location request: ' + err;
       } else if (res.ok) {
         locale.innerText = res.city + ', ' + res.regionName + ' ' + res.zip + ', ' + res.country;
-        fcn(res);
+        console.log('location response:', res);
+        fcn(res.body);
       } else {
         console.warn(res.status);
         temp.innerText = 'There was a problem with the location request';
