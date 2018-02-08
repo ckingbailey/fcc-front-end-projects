@@ -16,14 +16,15 @@ if (process.env.NODE_ENV !== 'production') {
 
 // constants
 const endpoint = 'https://api.twitch.tv/helix'
-const CLIENT_ID = process.env.CLIENT_ID
+const CLIENT_ID = process.env.TWITCH_CLIENT_ID
 
-export default function getStreams(users, fn) {
+function getStreams(users, fn) {
   // TODO: this could all be a little more concise and less repetitive
   if (typeof users !== 'object') {
     request(`${endpoint}/streams?client_id=${CLIENT_ID}&user_login=${users}`, (err, res, body) => {
       if (err) throw new Error(err)
-      else if (res.status.includes(200)) fn(body.data)
+      else if (res.statusCode === 200) fn(body.data)
+      else console.log('wtf happend?', CLIENT_ID, res.statusCode)
     })
   } else {
     const usersList = users.reduce((acc, user, i, arr) => {
@@ -36,7 +37,8 @@ export default function getStreams(users, fn) {
     }, '')
     request(`${endpoint}/streams?client_id=${CLIENT_ID}&${usersList}`, (err, res, body) => {
       if (err) throw new Error(err)
-      else if (res.status.includes(200)) fn(body.data)
+      else if (res.statusCode === 200) fn(body.data)
+      else console.log('wtf happend?', CLIENT_ID, res.statusCode)
     })
   }
 }
@@ -44,3 +46,5 @@ export default function getStreams(users, fn) {
 getStreams('freecodecamp', (data) => {
   console.log(data)
 })
+
+module.exports = getStreams
