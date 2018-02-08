@@ -26,5 +26,8 @@
     "rules": {
       "space-before-function-paren": 0
     }
+  },
+  "devDependencies": {
+    "rollup": "^0.55.3"
   }
 }
