@@ -21,5 +21,10 @@
   "bugs": {
     "url": "https://github.com/ckingbailey/fcc-front-end-projects/issues"
   },
-  "homepage": "https://github.com/ckingbailey/fcc-front-end-projects#readme"
+  "homepage": "https://github.com/ckingbailey/fcc-front-end-projects#readme",
+  "eslintConfig": {
+    "rules": {
+      "space-before-function-paren": 0
+    }
+  }
 }
