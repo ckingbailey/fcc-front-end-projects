@@ -15,18 +15,17 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // constants
-const endpoint = 'https://api.twitch.tv/helix'
+const endpoint = 'https://api.twitch.tv/kraken'
 const CLIENT_ID = process.env.TWITCH_CLIENT_ID
+
+function wtf() {
+  console.log('wtf hapnd?', arguments)
+}
 
 function getStreams(users, fn) {
   // TODO: this could all be a little more concise and less repetitive
-  if (typeof users !== 'object') {
-    request(`${endpoint}/streams?client_id=${CLIENT_ID}&user_login=${users}`, (err, res, body) => {
-      if (err) throw new Error(err)
-      else if (res.statusCode === 200) fn(body.data)
-      else console.log('wtf happend?', CLIENT_ID, res.statusCode)
-    })
-  } else {
+  let target = `${endpoint}/streams?client_id=${CLIENT_ID}`
+  if (typeof users === 'object') {
     const usersList = users.reduce((acc, user, i, arr) => {
       acc += 'user_login=' + user + '&'
       // if it's not the last index, append '&' to usersList string
@@ -35,16 +34,17 @@ function getStreams(users, fn) {
       }
       return acc
     }, '')
-    request(`${endpoint}/streams?client_id=${CLIENT_ID}&${usersList}`, (err, res, body) => {
-      if (err) throw new Error(err)
-      else if (res.statusCode === 200) fn(body.data)
-      else console.log('wtf happend?', CLIENT_ID, res.statusCode)
-    })
-  }
+    target += usersList
+  } else target += `&user_login=${users}`
+  request(target, (err, res, body) => {
+    if (err) throw new Error(err)
+    else if (res.statusCode === 200) fn(body)
+    else console.log('wtf happend?', target, CLIENT_ID, res.statusCode)
+  })
 }
 
 getStreams('freecodecamp', (data) => {
-  console.log(data)
+  console.log('success:', JSON.parse(data))
 })
 
 module.exports = getStreams
