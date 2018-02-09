@@ -25,36 +25,53 @@ const options = {
 }
 const args = process.argv.slice(2)
 
-function wtf() {
-  console.log('wtf hapnd?', arguments)
-}
-
-// currently this uses Twitch API v5 syntax
-// v5 will be deprecated 12/31/18
-// it's anyone's guess when v6 will be ready
-function getStreams(users, queryParam, fn) {
-  options.url += `/${queryParam}?`
+function parseUsers(users, paramName) {
   if (typeof users === 'object') {
     const usersList = users.reduce((acc, user, i, arr) => {
       if (i !== 0) {
         acc += '&'
       }
-      acc += 'user_login=' + user
+      acc += paramName + '=' + user
       return acc
     }, '')
-    options.url += usersList
-  } else options.url += `user_login=${users}`
+    return usersList
+  } else return `${paramName}=${users}`
+}
+
+function handleResponse(err, res, body, fn) {
+  if (err) throw new Error(err)
+  else if (res.statusCode === 200) {
+    console.log('success!', options)
+    fn(body)
+  } else wtf(options, `${res.statusCode}: ${res.statusMessage}`, body.message, res.headers)
+}
+
+function wtf() {
+  console.log('wtf hapnd?', arguments)
+}
+
+function getUsers(users, fn) {
+  if (!args || args.length < 1) {
+    throw new Error('We need some users to query')
+  }
+  options.url += '/users?' + parseUsers(users, 'login')
   request(options, (err, res, body) => {
-    if (err) throw new Error(err)
-    else if (res.statusCode === 200) {
-      console.log('success!', options)
-      fn(body)
-    } else wtf(options, `${res.statusCode}: ${res.statusMessage}`, res.headers)
+    handleResponse(err, res, body, fn)
   })
 }
 
-getStreams(args, 'streams', (data) => {
+function getStreams(users, fn) {
+  if (!args || args.length < 1) {
+    throw new Error('We need some users to query')
+  }
+  options.url += '/streams?' + parseUsers(users, 'user_login')
+  request(options, (err, res, body) => {
+    handleResponse(err, res, body, fn)
+  })
+}
+
+getUsers(args, (data) => {
   console.log(JSON.parse(data))
 })
 
-module.exports = getStreams
+module.exports = { getStreams, getUsers }
