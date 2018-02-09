@@ -1,0 +1,33 @@
+{
+  "name": "twitch-tracker",
+  "version": "0.0.1",
+  "description": "see who's streaming on Twitch.tv",
+  "main": "index.html",
+  "scripts": {
+    "start": "serve public",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ckingbailey/fcc-front-end-projects.git"
+  },
+  "keywords": [
+    "Twitch",
+    "twitch.tv",
+    "fcc"
+  ],
+  "author": "ckb",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ckingbailey/fcc-front-end-projects/issues"
+  },
+  "homepage": "https://github.com/ckingbailey/fcc-front-end-projects#readme",
+  "eslintConfig": {
+    "rules": {
+      "space-before-function-paren": 0
+    }
+  },
+  "devDependencies": {
+    "rollup": "^0.55.3"
+  }
+}
