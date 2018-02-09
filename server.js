@@ -3,10 +3,13 @@
 // dependencies
 const bodyParser = require('body-parser')
 const express = require('express')
-// const path = require('path')
+const path = require('path')
 const request = require('request')
 
 const app = express()
+
+// modules
+const fetchTwitch = require(path.resolve(__dirname, 'modules/api-calls/fetch_twitch.js'))
 
 // when in development do as developers do
 if (process.env.NODE_ENV !== 'production') {
@@ -56,4 +59,5 @@ app.post('/weather', (req, res) => {
 
 const listener = app.listen(PORT, () => {
   console.log('Listening on port ' + listener.address().port)
+  console.log(fetchTwitch)
 })

@@ -70,8 +70,4 @@ function getStreams(users, fn) {
   })
 }
 
-getUsers(args, (data) => {
-  console.log(JSON.parse(data))
-})
-
 module.exports = { getStreams, getUsers }
