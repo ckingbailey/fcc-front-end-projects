@@ -4,6 +4,7 @@
 // streams endpoint: GET https://api.twitch.tv/helix/streams
 // streams qry params: ?user_id=<String>&user_login=<String>&type=<"all"|"live"|"vodcast">&
 // streams response: data: { pagination: String, started_at: String, thumbnail_url: String, title: String, type: "live"|"vodcast"|"", user_id: String, viewer_count: Number }
+// application/vnd.twitchtv.v<version>+json
 
 // fetch streams
 // if user is not streaming, fetch users and display information about user
@@ -15,36 +16,45 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // constants
-const endpoint = 'https://api.twitch.tv/kraken'
+const endpoint = 'https://api.twitch.tv/helix'
 const CLIENT_ID = process.env.TWITCH_CLIENT_ID
+const options = {
+  url: endpoint,
+  Method: 'GET',
+  headers: { 'Client-ID': CLIENT_ID }
+}
+const args = process.argv.slice(2)
 
 function wtf() {
   console.log('wtf hapnd?', arguments)
 }
 
-function getStreams(users, fn) {
-  // TODO: this could all be a little more concise and less repetitive
-  let target = `${endpoint}/streams?client_id=${CLIENT_ID}`
+// currently this uses Twitch API v5 syntax
+// v5 will be deprecated 12/31/18
+// it's anyone's guess when v6 will be ready
+function getStreams(users, queryParam, fn) {
+  options.url += `/${queryParam}?`
   if (typeof users === 'object') {
     const usersList = users.reduce((acc, user, i, arr) => {
-      acc += 'user_login=' + user + '&'
-      // if it's not the last index, append '&' to usersList string
-      if (i < arr.length - 1) {
+      if (i !== 0) {
         acc += '&'
       }
+      acc += 'user_login=' + user
       return acc
     }, '')
-    target += usersList
-  } else target += `&user_login=${users}`
-  request(target, (err, res, body) => {
+    options.url += usersList
+  } else options.url += `user_login=${users}`
+  request(options, (err, res, body) => {
     if (err) throw new Error(err)
-    else if (res.statusCode === 200) fn(body)
-    else console.log('wtf happend?', target, CLIENT_ID, res.statusCode)
+    else if (res.statusCode === 200) {
+      console.log('success!', options)
+      fn(body)
+    } else wtf(options, `${res.statusCode}: ${res.statusMessage}`, res.headers)
   })
 }
 
-getStreams('freecodecamp', (data) => {
-  console.log('success:', JSON.parse(data))
+getStreams(args, 'streams', (data) => {
+  console.log(JSON.parse(data))
 })
 
 module.exports = getStreams
