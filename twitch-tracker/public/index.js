@@ -1,6 +1,5 @@
-import getStreams from './fetch'
-
 const container = document.getElementById('mainContainer')
+const endpoint = 'http://localhost:3001'
 
 function createStreamContainer(streamData) {
   const userContainer = document.createElement('div')
@@ -10,6 +9,14 @@ function createStreamContainer(streamData) {
   // user name, whether they are streaming, what they are streaming, for how long, how many viewers
 }
 
-getStreams('freecodecamp', (data) => {
-  console.log(data)
-})
+function getUsers(login) {
+  const users = typeof login !== 'object'
+    ? Object.keys.length === 1
+      ? login[Object.keys[0]] : null : null // fill this in later. quitting time now
+  const target = endpoint + '/users?' + users
+  window.fetch(target)
+    .then(res => {
+      // do something
+      // probably createStreamContainer
+    })
+}

@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require('path')
 
 module.exports = {
   entry: './js/dev/index.js',
@@ -13,4 +13,4 @@ module.exports = {
       loader: "babel-loader" }
   ]
   }
-};
+}
