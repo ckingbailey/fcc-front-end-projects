@@ -8,7 +8,6 @@ const qs = require('querystring')
 const request = require('request')
 
 const app = express()
-const twitchRouter = express.Router()
 
 // modules
 const fetchTwitch = require(path.resolve(__dirname, 'modules/api-calls/fetch_twitch.js'))
@@ -22,6 +21,7 @@ if (process.env.NODE_ENV !== 'production') {
 const PORT = process.env.PORT || 3001
 const WEATHER_KEY = process.env.WEATHER_KEY
 const WEATHER_URL = 'http://api.openweathermap.org/data/2.5/weather'
+const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID
 // const pubPath = path.resolve(__dirname, 'public')
 
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -36,23 +36,9 @@ app.use((req, res, next) => {
   next()
 })
 
-// for twitch tracker there should be different routes for users and stream
-// the app will first qry users, populate dom elements with data
-// then qry streams. if no streams, display data from users
-// if streams, display stream data
-twitchRouter.get('/', (req, res, next) => {
-  console.log('twitch-tracker route called')
-  next()
-})
-
-twitchRouter.get('/users', (req, res) => {
-  console.log('/twitch-tracker/users route')
-  res.send(req.query)
-})
-
-twitchRouter.get('/streams', (req, res) => {
-  console.log('twitch-tracker/streams route')
-  res.send(req.query)
+// twitch route now simply returns the appropriate Client_Id
+app.get('/twitch', (req, res) => {
+  res.send(TWITCH_CLIENT_ID)
 })
 
 // routes
@@ -75,8 +61,6 @@ app.post('/weather', (req, res) => {
     }
   })
 })
-
-app.use('/twitch-tracker', twitchRouter)
 
 const listener = app.listen(PORT, () => {
   console.log('Listening on port ' + listener.address().port)
