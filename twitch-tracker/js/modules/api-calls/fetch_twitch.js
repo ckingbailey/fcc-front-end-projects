@@ -9,21 +9,12 @@
 // fetch streams
 // if user is not streaming, fetch users and display information about user
 
-// dependencies
-const request = require('request')
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').load()
-}
-
 // constants
 const endpoint = 'https://api.twitch.tv/helix'
-const CLIENT_ID = process.env.TWITCH_CLIENT_ID
 const options = {
-  url: endpoint,
   Method: 'GET',
-  headers: { 'Client-ID': CLIENT_ID }
+  headers: { 'Client-ID': '' }
 }
-const args = process.argv.slice(2)
 
 function parseUsers(users, paramName) {
   if (typeof users === 'object') {
@@ -38,36 +29,38 @@ function parseUsers(users, paramName) {
   } else return `${paramName}=${users}`
 }
 
-function handleResponse(err, res, body, fn) {
-  if (err) throw new Error(err)
-  else if (res.statusCode === 200) {
-    console.log('success!', options)
-    fn(body)
-  } else wtf(options, `${res.statusCode}: ${res.statusMessage}`, body.message, res.headers)
-}
-
 function wtf() {
   console.log('wtf hapnd?', arguments)
 }
 
-function getUsers(users, fn) {
-  if (!args || args.length < 1) {
-    throw new Error('We need some users to query')
-  }
-  options.url += '/users?' + parseUsers(users, 'login')
-  request(options, (err, res, body) => {
-    handleResponse(err, res, body, fn)
-  })
+function getUsers(users, key, fn) {
+  const target = endpoint + '/users?' + parseUsers(users, 'login')
+  options.header['Client-ID'] = key
+  window.fetch(target, options)
+    .then(res => {
+      res.json()
+    })
+    .then(json => {
+      fn(json)
+    })
+    .catch(err => {
+      wtf(err)
+    })
 }
 
-function getStreams(users, fn) {
-  if (!args || args.length < 1) {
-    throw new Error('We need some users to query')
-  }
-  options.url += '/streams?' + parseUsers(users, 'user_login')
-  request(options, (err, res, body) => {
-    handleResponse(err, res, body, fn)
-  })
+function getStreams(users, key, fn) {
+  const target = endpoint + '/streams?' + parseUsers(users, 'user_login')
+  options.header['Client-ID'] = key
+  window.fetch(target, options)
+    .then(res => {
+      res.json()
+    })
+    .then(json => {
+      fn(json)
+    })
+    .catch(err => {
+      wtf(err)
+    })
 }
 
-module.exports = { getStreams, getUsers }
+export { getStreams, getUsers }

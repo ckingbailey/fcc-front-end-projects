@@ -3,14 +3,11 @@
 // dependencies
 const bodyParser = require('body-parser')
 const express = require('express')
-const path = require('path')
-const qs = require('querystring')
 const request = require('request')
 
 const app = express()
 
 // modules
-const fetchTwitch = require(path.resolve(__dirname, 'modules/api-calls/fetch_twitch.js'))
 
 // when in development do as developers do
 if (process.env.NODE_ENV !== 'production') {

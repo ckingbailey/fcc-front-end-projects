@@ -24,5 +24,10 @@
   "homepage": "https://github.com/ckingbailey/fcc-front-end-projects#readme",
   "devDependencies": {
     "rollup": "^0.55.3"
+  },
+  "eslintConfig": {
+    "rules": {
+      "space-before-function-paren": 0
+    }
   }
 }
