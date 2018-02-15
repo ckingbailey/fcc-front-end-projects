@@ -1,5 +1,5 @@
-import getKey from '../modules/api-calls/fetch_key'
-import { getStreams, getUsers } from '../modules/api-calls/fetch_twitch'
+import getKey from './modules/api-calls/fetch_key'
+import { getStreams, getUsers } from './modules/api-calls/fetch_twitch'
 
 const container = document.getElementById('mainContainer')
 const endpoint = 'https://sheltered-dusk-25569.herokuapp.com/twitch'

@@ -32,17 +32,22 @@
   "homepage": "https://github.com/ckingbailey/fcc-front-end-projects#readme",
   "dependencies": {
     "body-parser": "^1.18.2",
-    "dotenv": "^5.0.0",
     "express": "^4.16.2",
-    "nodemon": "^1.14.11",
     "request": "^2.83.0"
   },
   "devDependencies": {
-    "eslint": "^4.16.0",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.1",
+    "dotenv": "^5.0.0",
+    "eslint": "^4.17.0",
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-node": "^5.2.1",
     "eslint-plugin-promise": "^3.6.0",
-    "eslint-plugin-standard": "^3.0.1"
+    "eslint-plugin-standard": "^3.0.1",
+    "nodemon": "^1.14.12",
+    "webpack": "^3.11.0",
+    "webpack-dev-server": "^2.11.1"
   },
   "eslintConfig": {
     "rules": {
