@@ -44,6 +44,7 @@ function getUsers(users, key, fn) {
       fn(json)
     })
     .catch(err => {
+      // TODO: better error handling than this
       wtf(err)
     })
 }
@@ -59,6 +60,7 @@ function getStreams(users, key, fn) {
       fn(json)
     })
     .catch(err => {
+      // TODO: better error handling than this
       wtf(err)
     })
 }
