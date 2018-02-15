@@ -1,0 +1,196 @@
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, {
+/******/ 				configurable: false,
+/******/ 				enumerable: true,
+/******/ 				get: getter
+/******/ 			});
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_key__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__ = __webpack_require__(2);
+
+
+
+const container = document.getElementById('mainContainer')
+const endpoint = 'https://sheltered-dusk-25569.herokuapp.com/twitch'
+
+function createStreamContainer(streamData) {
+  const userContainer = document.createElement('div')
+  userContainer.classList.add('streamer-container')
+  container.appendChild(userContainer)
+  // TODO: what data do I want to display?
+  // user name, whether they are streaming, what they are streaming, for how long, how many viewers
+}
+
+// grab key from my server then query for user streams
+// if no streams, query those logins for user data
+// TODO: what user data is displayed?
+Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_key__["a" /* default */])(endpoint, clientId => {
+  Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* getStreams */])(['idlethumbs', 'freecodecamp'], clientId, data => {
+    // TODO: this should iterate over data
+    // passing each entry to cSC
+    // if no data at an entry, call getUsers()
+    console.log(data)
+  })
+})
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = getKey;
+function getKey(target, fn) {
+  window.fetch(endpoint)
+    .then(res => {
+      return res.text()
+    })
+    .then(key => {
+      fn(key)
+    })
+}
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return getStreams; });
+/* unused harmony export getUsers */
+// users endpoint: GET https://api.twitch.tv/helix/users
+// users query params: ?id=<String>&login=<String>
+// user response: data: { display_name: String, id: String, offline_image-url: String, profile_image_url: String }
+// streams endpoint: GET https://api.twitch.tv/helix/streams
+// streams qry params: ?user_id=<String>&user_login=<String>&type=<"all"|"live"|"vodcast">&
+// streams response: data: { pagination: String, started_at: String, thumbnail_url: String, title: String, type: "live"|"vodcast"|"", user_id: String, viewer_count: Number }
+// application/vnd.twitchtv.v<version>+json
+
+// fetch streams
+// if user is not streaming, fetch users and display information about user
+
+// constants
+const endpoint = 'https://api.twitch.tv/helix'
+const options = {
+  Method: 'GET',
+  headers: { 'Client-ID': '' }
+}
+
+function parseUsers(users, paramName) {
+  if (typeof users === 'object') {
+    const usersList = users.reduce((acc, user, i, arr) => {
+      if (i !== 0) {
+        acc += '&'
+      }
+      acc += paramName + '=' + user
+      return acc
+    }, '')
+    return usersList
+  } else return `${paramName}=${users}`
+}
+
+function wtf() {
+  console.log('wtf hapnd?', arguments)
+}
+
+function getUsers(users, key, fn) {
+  const target = endpoint + '/users?' + parseUsers(users, 'login')
+  options.header['Client-ID'] = key
+  window.fetch(target, options)
+    .then(res => {
+      res.json()
+    })
+    .then(json => {
+      fn(json)
+    })
+    .catch(err => {
+      // TODO: better error handling than this
+      wtf(err)
+    })
+}
+
+function getStreams(users, key, fn) {
+  const target = endpoint + '/streams?' + parseUsers(users, 'user_login')
+  options.header['Client-ID'] = key
+  window.fetch(target, options)
+    .then(res => {
+      res.json()
+    })
+    .then(json => {
+      fn(json)
+    })
+    .catch(err => {
+      // TODO: better error handling than this
+      wtf(err)
+    })
+}
+
+
+
+
+/***/ })
+/******/ ]);

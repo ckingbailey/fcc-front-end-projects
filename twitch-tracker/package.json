@@ -5,6 +5,8 @@
   "main": "index.html",
   "scripts": {
     "start": "serve public",
+    "dev": "webpack-dev-server --env.production=false --open",
+    "build": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -22,10 +24,14 @@
     "url": "https://github.com/ckingbailey/fcc-front-end-projects/issues"
   },
   "homepage": "https://github.com/ckingbailey/fcc-front-end-projects#readme",
-  "devDependencies": {},
+  "devDependencies": {
+    "webpack": "^3.11.0",
+    "webpack-dev-server": "^2.11.1"
+  },
   "eslintConfig": {
     "rules": {
       "space-before-function-paren": 0
     }
-  }
+  },
+  "dependencies": {}
 }
