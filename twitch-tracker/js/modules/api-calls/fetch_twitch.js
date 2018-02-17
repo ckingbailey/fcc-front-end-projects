@@ -35,10 +35,12 @@ function wtf() {
 
 function getUsers(users, key, fn) {
   const target = endpoint + '/users?' + parseUsers(users, 'login')
-  options.header['Client-ID'] = key
+  console.log('users target', target)
+  options.headers['Client-ID'] = key
   window.fetch(target, options)
     .then(res => {
-      res.json()
+      console.log('res.headers:', res.headers)
+      return res.json()
     })
     .then(json => {
       fn(json)
@@ -51,7 +53,8 @@ function getUsers(users, key, fn) {
 
 function getStreams(users, key, fn) {
   const target = endpoint + '/streams?' + parseUsers(users, 'user_login')
-  options.header['Client-ID'] = key
+  console.log('streams target', target)
+  options.headers['Client-ID'] = key
   window.fetch(target, options)
     .then(res => {
       res.json()

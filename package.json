@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node server",
-    "devstart": "nodemon server",
+    "dev": "nodemon server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -45,9 +45,7 @@
     "eslint-plugin-node": "^5.2.1",
     "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-standard": "^3.0.1",
-    "nodemon": "^1.14.12",
-    "webpack": "^3.11.0",
-    "webpack-dev-server": "^2.11.1"
+    "nodemon": "^1.14.12"
   },
   "eslintConfig": {
     "rules": {

@@ -57,7 +57,7 @@
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
 /******/
 /******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
+/******/ 	__webpack_require__.p = "/Users/ckingbailey/Sites/git/fcc-front-end/twitch-tracker/public/js";
 /******/
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__(__webpack_require__.s = 0);
@@ -75,7 +75,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 const container = document.getElementById('mainContainer')
-const endpoint = 'https://sheltered-dusk-25569.herokuapp.com/twitch'
+const isProd = window.env && window.env.production
+const endpoint = isProd
+  ? 'https://sheltered-dusk-25569.herokuapp.com/twitch' : 'http://localhost:3001/twitch'
+const usersList = ['idlethumbs', 'freecodecamp']
+console.log('isProd? '+ isProd, 'api endpoint: ' + endpoint)
 
 function createStreamContainer(streamData) {
   const userContainer = document.createElement('div')
@@ -89,12 +93,20 @@ function createStreamContainer(streamData) {
 // if no streams, query those logins for user data
 // TODO: what user data is displayed?
 Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_key__["a" /* default */])(endpoint, clientId => {
-  Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* getStreams */])(['idlethumbs', 'freecodecamp'], clientId, data => {
-    // TODO: this should iterate over data
-    // passing each entry to cSC
-    // if no data at an entry, call getUsers()
-    console.log(data)
-  })
+  console.log(clientId)
+  if (clientId) {
+    Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* getStreams */])(usersList, clientId, streamData => {
+      // TODO: this should iterate over data
+      // passing each entry to cSC
+      // if no data at an entry, call getUsers()
+      console.log('users list:', usersList, 'getStreams response:', streamData)
+      if (!streamData) {
+        Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["b" /* getUsers */])(usersList, clientId, usersData => {
+          console.log('users list:', usersList, 'getUsers response:', usersData)
+        })
+      }
+    })
+  }
 })
 
 
@@ -105,12 +117,15 @@ Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_key__["a" /* default */])(en
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = getKey;
 function getKey(target, fn) {
-  window.fetch(endpoint)
+  window.fetch(target)
     .then(res => {
       return res.text()
     })
     .then(key => {
       fn(key)
+    })
+    .catch(err => {
+      throw new Error(err)
     })
 }
 
@@ -121,7 +136,7 @@ function getKey(target, fn) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return getStreams; });
-/* unused harmony export getUsers */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return getUsers; });
 // users endpoint: GET https://api.twitch.tv/helix/users
 // users query params: ?id=<String>&login=<String>
 // user response: data: { display_name: String, id: String, offline_image-url: String, profile_image_url: String }
@@ -159,10 +174,12 @@ function wtf() {
 
 function getUsers(users, key, fn) {
   const target = endpoint + '/users?' + parseUsers(users, 'login')
-  options.header['Client-ID'] = key
+  console.log('users target', target)
+  options.headers['Client-ID'] = key
   window.fetch(target, options)
     .then(res => {
-      res.json()
+      console.log('res.headers:', res.headers)
+      return res.json()
     })
     .then(json => {
       fn(json)
@@ -175,7 +192,8 @@ function getUsers(users, key, fn) {
 
 function getStreams(users, key, fn) {
   const target = endpoint + '/streams?' + parseUsers(users, 'user_login')
-  options.header['Client-ID'] = key
+  console.log('streams target', target)
+  options.headers['Client-ID'] = key
   window.fetch(target, options)
     .then(res => {
       res.json()

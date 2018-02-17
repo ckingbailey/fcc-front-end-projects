@@ -4,8 +4,8 @@
   "description": "see who's streaming on Twitch.tv",
   "main": "index.html",
   "scripts": {
-    "start": "serve public",
-    "dev": "webpack-dev-server --env.production=false --open",
+    "start": "serve public -p 3000 -o",
+    "live-build": "webpack --watch",
     "build": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

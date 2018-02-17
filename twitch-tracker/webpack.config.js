@@ -4,7 +4,8 @@ module.exports = (env = {}) => {
   return {
     entry: './js/modules/index.js',
     devServer: {
-      contentBase: './public'
+      contentBase: path.resolve(__dirname, 'public'),
+      port: 3000
     },
     module: {
       rules: [
@@ -14,7 +15,8 @@ module.exports = (env = {}) => {
     },
     output: {
       filename: 'main.js',
-      path: path.resolve(__dirname, 'public/js')
+      path: path.resolve(__dirname, 'public/js'),
+      publicPath: path.resolve(__dirname, 'public/js')
     }
   }
 }
