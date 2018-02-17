@@ -83,26 +83,34 @@ console.log('isProd? ' + isProd, 'api endpoint: ' + endpoint)
 
 function createStreamContainer(streamData) {
   const userContainer = document.createElement('div')
+  const imgContainer = document.createElement('div')
+  const textContainer = document.createElement('div')
+  const streamContainer = document.createElement('div')
   const userIcon = document.createElement('img')
   const userHeading = document.createElement('h2')
   const userDescrip = document.createElement('p')
   const curStream = document.createElement('p')
   const lastStream = document.createElement('p')
-  userContainer.classList.add('streamer-container')
-  userContainer.id = `${streamData.login}Avatar`
+  userContainer.classList.add('streamer-container', 'flex-container')
+  userContainer.id = streamData.login
+  imgContainer.classList.add('flex-child')
+  textContainer.classList.add('flex-child')
+  streamContainer.classList.add('flex-child')
+  userContainer.appendChild(imgContainer)
+  userContainer.appendChild(textContainer)
   userIcon.classList.add('streamer-avatar')
   userIcon.src = streamData.profile_image_url
-  userContainer.appendChild(userIcon)
+  imgContainer.appendChild(userIcon)
   userHeading.classList.add('streamer-name')
   userHeading.innerText = streamData.display_name
-  userContainer.appendChild(userHeading)
+  textContainer.appendChild(userHeading)
   userDescrip.classList.add('description')
   userDescrip.innerText = streamData.description
-  userContainer.appendChild(userDescrip)
+  textContainer.appendChild(userDescrip)
   curStream.classList.add('current-stream')
-  userContainer.appendChild(curStream)
+  streamContainer.appendChild(curStream)
   lastStream.classList.add('prev-stream')
-  userContainer.appendChild(lastStream)
+  streamContainer.appendChild(lastStream)
   main.appendChild(userContainer)
   // TODO: what data do I want to display?
   // user name, whether they are streaming, what they are streaming, for how long, how many viewers
