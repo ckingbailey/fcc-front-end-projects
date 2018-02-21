@@ -1,0 +1,2 @@
+build: webpack --watch
+web: serve public -p 3000 -o

@@ -5,7 +5,7 @@ const main = document.getElementById('mainContainer')
 const isProd = window.env && window.env.production
 const endpoint = isProd
   ? 'https://sheltered-dusk-25569.herokuapp.com/twitch' : 'http://localhost:3001/twitch'
-const usersList = ['idlethumbs', 'freecodecamp']
+const usersList = ['idlethumbs', 'freecodecamp', 'phanxgames', 'omatum_greg', 'nlazcodes']
 console.log('isProd? ' + isProd, 'api endpoint: ' + endpoint)
 
 function createStreamContainer(streamData) {
