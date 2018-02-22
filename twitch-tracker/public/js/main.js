@@ -93,8 +93,9 @@ function createStreamerContainer(data, fn) {
   const curStream = document.createElement('p')
   const lastStream = document.createElement('p')
   streamerContainer.classList.add('streamer-container', 'flex-container')
-  imgContainer.classList.add('flex-child')
-  textContainer.classList.add('flex-child')
+  imgContainer.classList.add('flex-child', 'avatar-container')
+  textContainer.classList.add('flex-child', 'text-container')
+  streamContainer.classList.add('stream-container')
   streamerContainer.appendChild(imgContainer)
   streamerContainer.appendChild(textContainer)
   streamerAvatar.classList.add('streamer-avatar')
@@ -124,7 +125,8 @@ function populateUserData(element, data, fn) {
 }
 
 function populateStreamData(element, data, fn) {
-  element.querySelector('.current-stream').innerText = data.title
+  element.querySelector('.current-stream').innerText = 'CURRENTLY STREAMING: ' + data.title
+  element.querySelector('.stream-container').classList.add('is-streaming')
   fn(element, data)
 }
 // grab key from my server then query for user streams
@@ -141,8 +143,8 @@ Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_key__["a" /* default */])(en
       Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* getStreams */])(usersList, clientId, streamsData => {
         // if streamsData, add it to streamerContainers
         console.log('getStreams response:', streamsData)
-        console.log('Boolean(streamsData.data)', Boolean(streamsData.data))
-        if (streamsData.data) {
+        console.log('Boolean(streamsData.data.length)', Boolean(streamsData.data.length))
+        if (streamsData.data.length) {
           // append streamsData to each corresponding usersData element
           streamsData.data.forEach(stream => {
             usersData.data.forEach(user => {
