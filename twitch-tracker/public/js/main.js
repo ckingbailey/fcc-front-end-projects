@@ -78,7 +78,7 @@ const feed = document.getElementById('feed')
 const isProd = window.env && window.env.production
 const endpoint = isProd
   ? 'https://sheltered-dusk-25569.herokuapp.com/twitch' : 'http://localhost:3001/twitch'
-const usersList = ['idlethumbs', 'freecodecamp', 'phanxgames', 'omatum_greg', 'nlazcodes']
+const usersList = ['idlethumbs', 'freecodecamp', 'updownleftdie', 'omatum_greg', 'nlazcodes']
 console.log('isProd? ' + isProd, 'api endpoint: ' + endpoint)
 
 function createStreamerContainer(data, fn) {
@@ -95,7 +95,6 @@ function createStreamerContainer(data, fn) {
   streamerContainer.classList.add('streamer-container', 'flex-container')
   imgContainer.classList.add('flex-child')
   textContainer.classList.add('flex-child')
-  streamerContainer.classList.add('flex-child')
   streamerContainer.appendChild(imgContainer)
   streamerContainer.appendChild(textContainer)
   streamerAvatar.classList.add('streamer-avatar')
@@ -110,16 +109,22 @@ function createStreamerContainer(data, fn) {
   streamContainer.appendChild(curStream)
   lastStream.classList.add('prev-stream')
   streamContainer.appendChild(lastStream)
+  textContainer.appendChild(streamContainer)
   fn(streamerContainer, data)
   // TODO: what data do I want to display?
   // user name, whether they are streaming, what they are streaming, for how long, how many viewers
 }
 
-function populateStreamerContainer(element, data, fn) {
+function populateUserData(element, data, fn) {
   element.querySelector('.streamer-avatar').src = data.profile_image_url
   element.querySelector('.streamer-link').href = `https://www.twitch.tv/${data.login}`
   element.querySelector('.streamer-name').innerText = data.display_name
   element.querySelector('.description').innerText = data.description
+  fn(element, data)
+}
+
+function populateStreamData(element, data, fn) {
+  element.querySelector('.current-stream').innerText = data.title
   fn(element, data)
 }
 // grab key from my server then query for user streams
@@ -128,17 +133,50 @@ function populateStreamerContainer(element, data, fn) {
 Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_key__["a" /* default */])(endpoint, clientId => {
   console.log(clientId)
   if (clientId) {
-    Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* getUsers */])(usersList, clientId, usersData => {
+    Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["b" /* getUsers */])(usersList, clientId, usersData => {
+      // call getStreams after getUsers
+      // populateStreamerContainer with streamsData and usersData
+      // if no streamData, populateStreamerContainer with usersData only
       console.log('users list:', usersList, 'getUsers response:', usersData)
-      if (usersData.data) {
-        usersData.data.forEach(obj => {
-          createStreamerContainer(obj, (element, obj) => {
-            populateStreamerContainer(element, obj, function(element) {
-              feed.appendChild(element)
+      Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* getStreams */])(usersList, clientId, streamsData => {
+        // if streamsData, add it to streamerContainers
+        console.log('getStreams response:', streamsData)
+        console.log('Boolean(streamsData.data)', Boolean(streamsData.data))
+        if (streamsData.data) {
+          // append streamsData to each corresponding usersData element
+          streamsData.data.forEach(stream => {
+            usersData.data.forEach(user => {
+              if (user.id === stream.user_id) {
+                const streamUser = Object.assign({}, user, stream)
+                createStreamerContainer(streamUser, (element, streamUser) => {
+                  console.log('element@createStreamerContainer', streamUser.user_id, element)
+                  populateUserData(element, streamUser, (element, streamUser) => {
+                    console.log('element@populateUserData', streamUser.user_id, element)
+                    populateStreamData(element, streamUser, (element, steamUser) => {
+                      console.log('element@populateStreamData', streamUser.user_id, element)
+                      feed.appendChild(element)
+                    })
+                  })
+                })
+              } else {
+                createStreamerContainer(user, (element, user) => {
+                  populateUserData(element, user, function(element) {
+                    feed.appendChild(element)
+                  })
+                })
+              }
             })
           })
-        })
-      }
+        } else {
+          usersData.data.forEach(user => {
+            createStreamerContainer(user, (element, user) => {
+              populateUserData(element, user, function(element) {
+                feed.appendChild(element)
+              })
+            })
+          })
+        }
+      })
     })
   }
 })
@@ -169,8 +207,8 @@ function getKey(target, fn) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* unused harmony export getStreams */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return getUsers; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return getStreams; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return getUsers; });
 // users endpoint: GET https://api.twitch.tv/helix/users
 // users query params: ?id=<String>&login=<String>
 // user response: data: { display_name: String, id: String, offline_image-url: String, profile_image_url: String }
@@ -230,7 +268,7 @@ function getStreams(users, key, fn) {
   options.headers['Client-ID'] = key
   window.fetch(target, options)
     .then(res => {
-      res.json()
+      return res.json()
     })
     .then(json => {
       fn(json)

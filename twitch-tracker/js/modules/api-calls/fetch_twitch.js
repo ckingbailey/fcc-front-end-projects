@@ -57,7 +57,7 @@ function getStreams(users, key, fn) {
   options.headers['Client-ID'] = key
   window.fetch(target, options)
     .then(res => {
-      res.json()
+      return res.json()
     })
     .then(json => {
       fn(json)

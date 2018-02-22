@@ -10,7 +10,8 @@ module.exports = (env = {}) => {
     module: {
       rules: [
         { test: /\.js$/,
-          exclude: /node_modules/ }
+          exclude: /node_modules/
+        }
       ]
     },
     output: {

@@ -27,8 +27,7 @@
   "homepage": "https://github.com/ckingbailey/fcc-front-end-projects#readme",
   "devDependencies": {
     "foreman": "^2.0.0",
-    "webpack": "^3.11.0",
-    "webpack-dev-server": "^2.11.1"
+    "webpack": "^3.11.0"
   },
   "eslintConfig": {
     "rules": {
