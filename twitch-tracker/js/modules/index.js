@@ -1,5 +1,6 @@
 import getKey from './api-calls/fetch_key'
 import { getStreams, getUsers } from './api-calls/fetch_twitch'
+import { setLocal, getLocal } from './api-calls/storage.js'
 
 const feed = document.getElementById('feed')
 const isProd = window.env && window.env.production
@@ -16,9 +17,9 @@ function createStreamerContainer(data, fn) {
   const streamerAvatar = document.createElement('img')
   const userLink = document.createElement('a')
   const userHeading = document.createElement('h2')
-  const userDescrip = document.createElement('p')
-  const curStream = document.createElement('p')
-  const lastStream = document.createElement('p')
+  const [ userDescrip, curStream, lastStream ] =
+    [ document.createElement('p'), document.createElement('p'),
+      document.createElement('p')]
   streamerContainer.classList.add('streamer-container', 'flex-container')
   imgContainer.classList.add('flex-child', 'avatar-container')
   textContainer.classList.add('flex-child', 'text-container')
@@ -56,25 +57,21 @@ function populateStreamData(element, data, fn) {
   element.querySelector('.stream-container').classList.add('is-streaming')
   fn(element, data)
 }
-// grab key from my server then query for user streams
-// if no streams, query those logins for user data
-// TODO: what user data is displayed?
-getKey(endpoint, clientId => {
-  console.log(clientId)
-  if (clientId) {
-    getUsers(usersList, clientId, usersData => {
-      // call getStreams after getUsers
-      // populateStreamerContainer with streamsData and usersData
-      // if no streamData, populateStreamerContainer with usersData only
-      console.log('users list:', usersList, 'getUsers response:', usersData)
+// first try to get users from local storage
+const storedUsers = getLocal('twitchUsersData')
+if (storedUsers) {
+  console.log('users from storage', storedUsers)
+  getKey(endpoint, clientId => {
+    console.log(clientId)
+    if (clientId) {
       getStreams(usersList, clientId, streamsData => {
-        // if streamsData, add it to streamerContainers
+      // if streamsData, add it to streamerContainers
         console.log('getStreams response:', streamsData)
         console.log('Boolean(streamsData.data.length)', Boolean(streamsData.data.length))
         if (streamsData.data.length) {
           // append streamsData to each corresponding usersData element
           streamsData.data.forEach(stream => {
-            usersData.data.forEach(user => {
+            storedUsers.data.forEach(user => {
               if (user.id === stream.user_id) {
                 const streamUser = Object.assign({}, user, stream)
                 createStreamerContainer(streamUser, (element, streamUser) => {
@@ -97,7 +94,7 @@ getKey(endpoint, clientId => {
             })
           })
         } else {
-          usersData.data.forEach(user => {
+          storedUsers.data.forEach(user => {
             createStreamerContainer(user, (element, user) => {
               populateUserData(element, user, function(element) {
                 feed.appendChild(element)
@@ -106,6 +103,69 @@ getKey(endpoint, clientId => {
           })
         }
       })
-    })
-  }
-})
+    }
+  })
+} else {
+  // if no stored users
+  // grab key from my server then query for users
+  // then query for streams
+  // store the user response and date of stream in an array at the key `twitchUsersData`
+  getKey(endpoint, clientId => {
+    console.log(clientId)
+    if (clientId) {
+      getUsers(usersList, clientId, usersData => {
+        // call getStreams after getUsers
+        // populateStreamerContainer with streamsData and usersData
+        // if no streamData, populateStreamerContainer with usersData only
+        console.log('users list:', usersList, 'getUsers response:', usersData)
+        getStreams(usersList, clientId, streamsData => {
+          // if streamsData, add it to streamerContainers
+          console.log('getStreams response:', streamsData)
+          console.log('Boolean(streamsData.data.length)', Boolean(streamsData.data.length))
+          if (streamsData.data.length) {
+            // append streamsData to each corresponding usersData element
+            setLocal('twitchUsersData',
+              usersData.data.map(user => {
+                const curStream = streamsData.data.filter(stream => {
+                  return user.id === stream.user_id
+                })[0]
+                if (streamsData.data.filter(stream => user.id === stream.user_id)[0]) {
+                  user.stream = { last_stream: curStream.started_at,
+                    last_stream_id: curStream.id }
+                  const streamingUser = Object.assign(user, { stream: curStream })
+                  createStreamerContainer(streamingUser, (element, streamingUser) => {
+                    console.log('element@createStreamerContainer', streamingUser.user_id, element)
+                    populateUserData(element, streamingUser, (element, streamingUser) => {
+                      console.log('element@populateUserData', streamingUser.user_id, element)
+                      populateStreamData(element, streamingUser, (element, streamingUser) => {
+                        console.log('element@populateStreamData', streamingUser.user_id, element)
+                        feed.appendChild(element)
+                      })
+                    })
+                  })
+                } else {
+                  createStreamerContainer(user, (element, user) => {
+                    populateUserData(element, user, function(element) {
+                      feed.appendChild(element)
+                    })
+                  })
+                }
+                return user
+              })
+            )
+          } else {
+            // if no streams data, store and display usersData unmodified
+            setLocal('twitchUsersData', JSON.stringify(usersData))
+            usersData.data.forEach(user => {
+              createStreamerContainer(user, (element, user) => {
+                populateUserData(element, user, function(element) {
+                  feed.appendChild(element)
+                })
+              })
+            })
+          }
+        })
+      })
+    }
+  })
+}
