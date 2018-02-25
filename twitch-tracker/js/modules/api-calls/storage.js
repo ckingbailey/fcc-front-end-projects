@@ -28,8 +28,7 @@ function getLocal(key) {
   if (!item) {
     return false
   } else {
-    JSON.parse(item)
-    return item
+    return JSON.parse(item)
   }
 }
 
