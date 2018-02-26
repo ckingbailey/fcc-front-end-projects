@@ -1,13 +1,37 @@
 import getKey from './api-calls/fetch_key'
 import { getStreams, getUsers } from './api-calls/fetch_twitch'
+import liveSearch from './search'
 import { setLocal, getLocal } from './api-calls/storage.js' // NOTE: getLocal|setLocal stringifies|parse value for you
 
-const feed = document.getElementById('feed')
+// constants
 const isProd = window.env && window.env.production
 const endpoint = isProd
   ? 'https://sheltered-dusk-25569.herokuapp.com/twitch' : 'http://localhost:3001/twitch'
 const usersList = ['idlethumbs', 'freecodecamp', 'updownleftdie', 'omatum_greg', 'nlazcodes']
 console.log('isProd? ' + isProd, 'api endpoint: ' + endpoint)
+
+// DOM elements
+const feed = document.getElementById('feed')
+const searchForm = document.getElementById('searchForm')
+searchForm.addEventListener('submit', handleSearchSubmit)
+const searchField = document.getElementById('searchField')
+searchField.addEventListener('input', handleSearchInput)
+
+function handleSearchSubmit(ev) {
+  ev.preventDefault()
+  console.log(ev.target)
+}
+
+function handleSearchInput(ev) {
+  console.log(ev.target.value)
+  if (ev.target.value.length > 1) {
+    getKey(endpoint, key => {
+      liveSearch(key, ev.target.value, data => {
+        console.log(data)
+      })
+    })
+  }
+}
 
 function createStreamerContainer(data, fn) {
   // streamer container components

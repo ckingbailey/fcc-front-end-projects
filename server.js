@@ -5,9 +5,12 @@ const bodyParser = require('body-parser')
 const express = require('express')
 const request = require('request')
 
+// instances
 const app = express()
+const twitchRouter = express.Router()
 
 // modules
+const fetchTwitch = require('./modules/fetch_twitch')
 
 // when in development do as developers do
 if (process.env.NODE_ENV !== 'production') {
@@ -19,6 +22,9 @@ const PORT = process.env.PORT || 3001
 const WEATHER_KEY = process.env.WEATHER_KEY
 const WEATHER_URL = 'http://api.openweathermap.org/data/2.5/weather'
 const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID
+const TWITCH_ENDPOINT = 'https://api.twitch.tv'
+const TWITCH_HELIX_ENDPOINT = `${TWITCH_ENDPOINT}/helix`
+const TWITCH_KRAKEN_ENDPOINT = `${TWITCH_ENDPOINT}/kraken`
 // const pubPath = path.resolve(__dirname, 'public')
 
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -33,12 +39,41 @@ app.use((req, res, next) => {
   next()
 })
 
-// twitch route now simply returns the appropriate Client_Id
-app.get('/twitch', (req, res) => {
-  res.send(TWITCH_CLIENT_ID)
-})
+// twitch route queries one of two twitch APIs and returns results to client
+twitchRouter
+  .get('/', (req, res, next) => {
+    console.log('I\'m listening')
+    next()
+  })
+  .get('/users', (req, res) => { // twitch users route
+    console.log('users route')
+    // TODO: authenticate the request params before sending them on
+    const options = {
+      url: `${TWITCH_HELIX_ENDPOINT}${req.url}`,
+      headers: {
+        'Client-ID': TWITCH_CLIENT_ID
+      }
+    }
+    // res.send(options.url)
+    // TODO: all this could use fetchTwitch module but I need to change it not to use window.fetch
+    request(options, (err, response, body) => {
+      if (err) throw new Error(err)
+      console.log('response from Twitch:', JSON.parse(body))
+      res.set('Content-Type', 'application/json')
+      res.send(JSON.parse(body))
+    })
+  })
+  .get('/streams', (req, res) => { // twitch streams route
+    console.log('streams route')
+  })
+  .get('/videos', (req, res) => { // twitch videos route (for data on prev stream)
+    console.log('videos route')
+  })
+  .get('/search', (req, res) => { // twitch channel search route
+    console.log('search route')
+  })
 
-// routes
+// weather route
 app.post('/weather', (req, res) => {
   // probably get weather here instead of returning key to front-end
   // parse req for units, lat, lon
@@ -58,6 +93,9 @@ app.post('/weather', (req, res) => {
     }
   })
 })
+
+// use twitchRouter for all paths `twitch`
+app.use('/twitch', twitchRouter)
 
 const listener = app.listen(PORT, () => {
   console.log('Listening on port ' + listener.address().port)

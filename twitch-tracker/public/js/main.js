@@ -71,15 +71,42 @@
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_key__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__search__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__ = __webpack_require__(3);
 
 
 
-const feed = document.getElementById('feed')
+ // NOTE: getLocal|setLocal stringifies|parse value for you
+
+// constants
 const isProd = window.env && window.env.production
 const endpoint = isProd
   ? 'https://sheltered-dusk-25569.herokuapp.com/twitch' : 'http://localhost:3001/twitch'
 const usersList = ['idlethumbs', 'freecodecamp', 'updownleftdie', 'omatum_greg', 'nlazcodes']
 console.log('isProd? ' + isProd, 'api endpoint: ' + endpoint)
+
+// DOM elements
+const feed = document.getElementById('feed')
+const searchForm = document.getElementById('searchForm')
+searchForm.addEventListener('submit', handleSearchSubmit)
+const searchField = document.getElementById('searchField')
+searchField.addEventListener('input', handleSearchInput)
+
+function handleSearchSubmit(ev) {
+  ev.preventDefault()
+  console.log(ev.target)
+}
+
+function handleSearchInput(ev) {
+  console.log(ev.target.value)
+  if (ev.target.value.length > 1) {
+    Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_key__["a" /* default */])(endpoint, key => {
+      Object(__WEBPACK_IMPORTED_MODULE_2__search__["a" /* default */])(key, ev.target.value, data => {
+        console.log(data)
+      })
+    })
+  }
+}
 
 function createStreamerContainer(data, fn) {
   // streamer container components
@@ -89,9 +116,9 @@ function createStreamerContainer(data, fn) {
   const streamerAvatar = document.createElement('img')
   const userLink = document.createElement('a')
   const userHeading = document.createElement('h2')
-  const userDescrip = document.createElement('p')
-  const curStream = document.createElement('p')
-  const lastStream = document.createElement('p')
+  const [ userDescrip, curStream, lastStream ] =
+    [ document.createElement('p'), document.createElement('p'),
+      document.createElement('p')]
   streamerContainer.classList.add('streamer-container', 'flex-container')
   imgContainer.classList.add('flex-child', 'avatar-container')
   textContainer.classList.add('flex-child', 'text-container')
@@ -129,25 +156,23 @@ function populateStreamData(element, data, fn) {
   element.querySelector('.stream-container').classList.add('is-streaming')
   fn(element, data)
 }
-// grab key from my server then query for user streams
-// if no streams, query those logins for user data
-// TODO: what user data is displayed?
-Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_key__["a" /* default */])(endpoint, clientId => {
-  console.log(clientId)
-  if (clientId) {
-    Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["b" /* getUsers */])(usersList, clientId, usersData => {
-      // call getStreams after getUsers
-      // populateStreamerContainer with streamsData and usersData
-      // if no streamData, populateStreamerContainer with usersData only
-      console.log('users list:', usersList, 'getUsers response:', usersData)
+// first try to get users from local storage
+const storedUsers = Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["a" /* getLocal */])('twitchUsersData')
+if (storedUsers) {
+  console.log('users from storage', typeof storedUsers, storedUsers)
+  Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_key__["a" /* default */])(endpoint, clientId => {
+    console.log(clientId)
+    if (clientId) {
       Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* getStreams */])(usersList, clientId, streamsData => {
+        // always set top level object to its own data property
+        streamsData = streamsData.data
         // if streamsData, add it to streamerContainers
         console.log('getStreams response:', streamsData)
-        console.log('Boolean(streamsData.data.length)', Boolean(streamsData.data.length))
-        if (streamsData.data.length) {
+        console.log('Boolean(streamsData.length)', Boolean(streamsData.length))
+        if (streamsData.length) {
           // append streamsData to each corresponding usersData element
-          streamsData.data.forEach(stream => {
-            usersData.data.forEach(user => {
+          streamsData.forEach(stream => {
+            storedUsers.forEach(user => {
               if (user.id === stream.user_id) {
                 const streamUser = Object.assign({}, user, stream)
                 createStreamerContainer(streamUser, (element, streamUser) => {
@@ -170,7 +195,7 @@ Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_key__["a" /* default */])(en
             })
           })
         } else {
-          usersData.data.forEach(user => {
+          storedUsers.forEach(user => {
             createStreamerContainer(user, (element, user) => {
               populateUserData(element, user, function(element) {
                 feed.appendChild(element)
@@ -179,9 +204,74 @@ Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_key__["a" /* default */])(en
           })
         }
       })
-    })
-  }
-})
+    }
+  })
+} else {
+  // if no stored users
+  // grab key from my server then query for users
+  // then query for streams
+  // store the user response and date of stream in an array at the key `twitchUsersData`
+  Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_key__["a" /* default */])(endpoint, clientId => {
+    console.log(clientId)
+    if (clientId) {
+      Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["b" /* getUsers */])(usersList, clientId, usersData => {
+        usersData = usersData.data
+        // call getStreams after getUsers
+        // populateStreamerContainer with streamsData and usersData
+        // if no streamData, populateStreamerContainer with usersData only
+        console.log('users list:', usersList, 'getUsers response:', usersData)
+        Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* getStreams */])(usersList, clientId, streamsData => {
+          streamsData = streamsData.data
+          // if streamsData, add it to streamerContainers
+          console.log('getStreams response:', streamsData)
+          console.log('Boolean(streamsData.length)', Boolean(streamsData.length))
+          if (streamsData.length) {
+            // append streamsData to each corresponding usersData element
+            Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData',
+              usersData.map(user => {
+                const curStream = streamsData.filter(stream => {
+                  return user.id === stream.user_id
+                })[0]
+                if (streamsData.filter(stream => user.id === stream.user_id)[0]) {
+                  user.stream = { last_stream: curStream.started_at,
+                    last_stream_id: curStream.id }
+                  const streamingUser = Object.assign(user, { stream: curStream })
+                  createStreamerContainer(streamingUser, (element, streamingUser) => {
+                    console.log('element@createStreamerContainer', streamingUser.user_id, element)
+                    populateUserData(element, streamingUser, (element, streamingUser) => {
+                      console.log('element@populateUserData', streamingUser.user_id, element)
+                      populateStreamData(element, streamingUser, (element, streamingUser) => {
+                        console.log('element@populateStreamData', streamingUser.user_id, element)
+                        feed.appendChild(element)
+                      })
+                    })
+                  })
+                } else {
+                  createStreamerContainer(user, (element, user) => {
+                    populateUserData(element, user, function(element) {
+                      feed.appendChild(element)
+                    })
+                  })
+                }
+                return user
+              })
+            )
+          } else {
+            // if no streams data, store and display usersData unmodified
+            Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', usersData)
+            usersData.forEach(user => {
+              createStreamerContainer(user, (element, user) => {
+                populateUserData(element, user, function(element) {
+                  feed.appendChild(element)
+                })
+              })
+            })
+          }
+        })
+      })
+    }
+  })
+}
 
 
 /***/ }),
@@ -282,6 +372,76 @@ function getStreams(users, key, fn) {
 }
 
 
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return setLocal; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return getLocal; });
+function setLocal(key, val) {
+  // check if storage accessible
+  if (!('localStorage' in window)) {
+    window.alert('This site wants to use html5 localStorage but your browser does not support it. Some features may not be available. Consider upgrading your browser to the most recent version.')
+    return false
+  }
+  // stringify values to make them storage-ready
+  val = JSON.stringify(val)
+  try {
+    window.localStorage.setItem(key, val)
+  } catch (e) {
+    if (e === 'QUOTA_EXCEEDED_ERR' || e.code === 22) {
+      // should I make this a choice?
+      window.alert('Local storage quota exceeded. Please clear storage and reload page to try again.')
+    }
+    // also check for security error?
+    // but what does that security error look like if I'm to check for it?
+  }
+  return { [key]: val }
+}
+
+function getLocal(key) {
+  if (!('localStorage' in window)) {
+    window.alert('This site wants to access html5 localStorage but your browser does not support it. Some features may not be available. Consider upgrading your browser to the most recent version.')
+    return false
+  }
+  var item = window.localStorage.getItem(key)
+  if (!item) {
+    return false
+  } else {
+    return JSON.parse(item)
+  }
+}
+
+
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = liveSearch;
+// constants
+const endpoint = 'https://api.twitch.tv/kraken/search/channels?query='
+const options = {
+  Method: 'GET',
+  headers: { 'Client-ID': '' }
+}
+
+function liveSearch(apiKey, term, fn) {
+  console.log(apiKey)
+  options['Client-ID'] = apiKey
+  window.fetch(`${endpoint}${term}`, options)
+    .then(res => {
+      return res.json()
+    })
+    .then(json => {
+      fn(json)
+    })
+}
 
 
 /***/ })

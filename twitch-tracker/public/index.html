@@ -3,15 +3,18 @@
   <head>
     <meta charset="utf-8">
     <title>Twitch teevee tracker</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <style media="screen">
     * {
       --pink: #ff80aa;
-      --green: #57f462e6;
+      --dark-pink: #100029;
+      --green: #2b9744e6;
       --lt-blue: #38deff;
-      --blue: #63a0f0;
+      --blue: #1595bc;
       --dark-blue: #112c6b;
       --near-white: #f6f6f6;
       --lt-grey: #eee;
+      --trans-grey: #e6e6e6e9;
       --grey: #999;
       --pad: .7rem;
       --pad-less: .5rem;
@@ -20,6 +23,7 @@
         calc(var(--pad-less) * .8)
         var(--pad-less)
         calc(var(--pad-less) * .85);
+      --border-radius: 3px;
       box-sizing: border-box;
     }
     html, body {
@@ -32,22 +36,23 @@
       font-family: monospace;
     }
     .main {
+      box-shadow: inset 0 0 .7rem 2px var(--dark-pink);
+      border-radius: var(--border-radius);
       margin: auto;
       margin-top: 0;
-      border-radius: 3px;
-      /* border: 1px solid var(--pink); */
       max-width: 80%;
       padding: .7rem;
       background-color: var(--pink);
     }
     .search-form {
+      padding: var(--pad-box-less);
       text-align: right;
     }
     .search-field {
       -webkit-appearance: none;
       box-shadow: none;
       margin: 1rem 0;
-      border-radius: 2px;
+      border-radius: var(--border-radius);
       border: 2px solid grey;
       min-width: 33%;
       padding: .45rem .35rem;
@@ -65,7 +70,8 @@
     }
     .feed {
       background-color: black;
-      box-shadow: inset 0 0 3px 2px var(--lt-grey);
+      border-radius: calc(var(--border-radius) * 2);
+      box-shadow: inset 0 0 6px 1px var(--trans-grey);
       min-height: 7rem;
       padding: var(--pad-box-less);
     }
@@ -82,7 +88,7 @@
       margin-right: var(--pad);
     }
     .streamer-container {
-      border-radius: 3px;
+      border-radius: var(--border-radius);
       border: 2px solid var(--green);
       padding: var(--pad-box);
       color: var(--lt-grey);
@@ -109,15 +115,15 @@
       color: var(--blue);
     }
     .stream-container.is-streaming {
-      border-radius: 3px;
+      border-radius: var(--border-radius);
       border: 1px solid var(--lt-grey);
     }
     </style>
   </head>
   <body>
     <div id="mainContainer" class="main container">
-      <form class="search-form">
-        <input class="search-field" type="text" placeholder="SEARCH" />
+      <form id="searchForm" class="search-form">
+        <input id="searchField" class="search-field" type="text" placeholder="SEARCH" />
       </form>
       <div id="feed" class="feed"></div>
     </div>
