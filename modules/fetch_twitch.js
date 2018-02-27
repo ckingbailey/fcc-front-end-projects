@@ -18,22 +18,18 @@ if (process.env.NODE_ENV !== 'production') {
 
 // constants
 const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID
-const options = {
-  url: 'https://api.twitch.tv',
-  Method: 'GET',
-  headers: { 'Client-ID': TWITCH_CLIENT_ID }
-}
 
 module.exports = function fetchTwitch (req, res) {
-  console.log(req.url)
   const reqParam = req.url.slice(1, req.url.indexOf('?'))
   const apiVersion = '/' + (reqParam.includes('search') ? 'kraken' : 'helix')
-  options.url += `${apiVersion}${req.url}`
-  console.log(options)
+  const options = {
+    url: `https://api.twitch.tv${apiVersion}${req.url}`,
+    Method: 'GET',
+    headers: { 'Client-ID': TWITCH_CLIENT_ID }
+  }
   request(options, (err, response, body) => {
     if (err) throw new Error(err)
     else {
-      console.log(JSON.parse(body))
       res.send(JSON.parse(body))
     }
   })
