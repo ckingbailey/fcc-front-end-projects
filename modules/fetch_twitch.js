@@ -9,62 +9,32 @@
 // fetch streams
 // if user is not streaming, fetch users and display information about user
 
+// dependencies
+const request = require('request')
+
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').load()
+}
+
 // constants
-const HELIX_ENDPOINT = 'https://api.twitch.tv/helix'
-const KRAKEN_ENDPOINT = 'https://api.twitch.tv/kraken'
+const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID
 const options = {
+  url: 'https://api.twitch.tv',
   Method: 'GET',
-  headers: { 'Client-ID': '' }
+  headers: { 'Client-ID': TWITCH_CLIENT_ID }
 }
 
-function parseUsers (users, paramName) {
-  if (typeof users === 'object') {
-    const usersList = users.reduce((acc, user, i, arr) => {
-      if (i !== 0) {
-        acc += '&'
-      }
-      acc += paramName + '=' + user
-      return acc
-    }, '')
-    return usersList
-  } else return `${paramName}=${users}`
-}
-
-function wtf () {
-  console.log('wtf hapnd?', arguments)
-}
-
-exports.getUsers = function getUsers (users, key, fn) {
-  const target = HELIX_ENDPOINT + '/users?' + parseUsers(users, 'login')
-  console.log('users target', target)
-  options.headers['Client-ID'] = key
-  window.fetch(target, options)
-    .then(res => {
-      console.log('res.headers:', res.headers)
-      return res.json()
-    })
-    .then(json => {
-      fn(json)
-    })
-    .catch(err => {
-      // TODO: better error handling than this
-      wtf(err)
-    })
-}
-
-exports.getStreams = function getStreams (users, key, fn) {
-  const target = HELIX_ENDPOINT + '/streams?' + parseUsers(users, 'user_login')
-  console.log('streams target', target)
-  options.headers['Client-ID'] = key
-  window.fetch(target, options)
-    .then(res => {
-      return res.json()
-    })
-    .then(json => {
-      fn(json)
-    })
-    .catch(err => {
-      // TODO: better error handling than this
-      wtf(err)
-    })
+module.exports = function fetchTwitch (req, res) {
+  console.log(req.url)
+  const reqParam = req.url.slice(1, req.url.indexOf('?'))
+  const apiVersion = '/' + (reqParam.includes('search') ? 'kraken' : 'helix')
+  options.url += `${apiVersion}${req.url}`
+  console.log(options)
+  request(options, (err, response, body) => {
+    if (err) throw new Error(err)
+    else {
+      console.log(JSON.parse(body))
+      res.send(JSON.parse(body))
+    }
+  })
 }

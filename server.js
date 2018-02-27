@@ -48,23 +48,21 @@ twitchRouter
   .get('/users', (req, res) => { // twitch users route
     console.log('users route')
     // TODO: authenticate the request params before sending them on
+    fetchTwitch(req, res)
+  })
+  .get('/streams', (req, res) => { // twitch streams route
+    console.log('streams route')
     const options = {
       url: `${TWITCH_HELIX_ENDPOINT}${req.url}`,
       headers: {
         'Client-ID': TWITCH_CLIENT_ID
       }
     }
-    // res.send(options.url)
-    // TODO: all this could use fetchTwitch module but I need to change it not to use window.fetch
     request(options, (err, response, body) => {
       if (err) throw new Error(err)
-      console.log('response from Twitch:', JSON.parse(body))
       res.set('Content-Type', 'application/json')
       res.send(JSON.parse(body))
     })
-  })
-  .get('/streams', (req, res) => { // twitch streams route
-    console.log('streams route')
   })
   .get('/videos', (req, res) => { // twitch videos route (for data on prev stream)
     console.log('videos route')
@@ -99,4 +97,5 @@ app.use('/twitch', twitchRouter)
 
 const listener = app.listen(PORT, () => {
   console.log('Listening on port ' + listener.address().port)
+  console.log(fetchTwitch)
 })
