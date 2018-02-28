@@ -69,11 +69,9 @@
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_key__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__search__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__ = __webpack_require__(3);
-
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch_route__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__search__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__api_calls_storage_js__ = __webpack_require__(3);
 
 
  // NOTE: getLocal|setLocal stringifies|parse value for you
@@ -100,10 +98,8 @@ function handleSearchSubmit(ev) {
 function handleSearchInput(ev) {
   console.log(ev.target.value)
   if (ev.target.value.length > 1) {
-    Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_key__["a" /* default */])(endpoint, key => {
-      Object(__WEBPACK_IMPORTED_MODULE_2__search__["a" /* default */])(key, ev.target.value, data => {
-        console.log(data)
-      })
+    Object(__WEBPACK_IMPORTED_MODULE_1__search__["a" /* default */])(ev.target.value, data => {
+      console.log(data)
     })
   }
 }
@@ -156,53 +152,45 @@ function populateStreamData(element, data, fn) {
   element.querySelector('.stream-container').classList.add('is-streaming')
   fn(element, data)
 }
-// first try to get users from local storage
-const storedUsers = Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["a" /* getLocal */])('twitchUsersData')
+
+// onload, load Twitch user data
+// first look to localStorage
+// if nothing in localStorage, qry server for data from Twitch
+const storedUsers = Object(__WEBPACK_IMPORTED_MODULE_2__api_calls_storage_js__["a" /* getLocal */])('twitchUsersData')
 if (storedUsers) {
-  console.log('users from storage', typeof storedUsers, storedUsers)
-  Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_key__["a" /* default */])(endpoint, clientId => {
-    console.log(clientId)
-    if (clientId) {
-      Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* getStreams */])(usersList, clientId, streamsData => {
-        // always set top level object to its own data property
-        streamsData = streamsData.data
-        // if streamsData, add it to streamerContainers
-        console.log('getStreams response:', streamsData)
-        console.log('Boolean(streamsData.length)', Boolean(streamsData.length))
-        if (streamsData.length) {
-          // append streamsData to each corresponding usersData element
-          streamsData.forEach(stream => {
-            storedUsers.forEach(user => {
-              if (user.id === stream.user_id) {
-                const streamUser = Object.assign({}, user, stream)
-                createStreamerContainer(streamUser, (element, streamUser) => {
-                  console.log('element@createStreamerContainer', streamUser.user_id, element)
-                  populateUserData(element, streamUser, (element, streamUser) => {
-                    console.log('element@populateUserData', streamUser.user_id, element)
-                    populateStreamData(element, streamUser, (element, steamUser) => {
-                      console.log('element@populateStreamData', streamUser.user_id, element)
-                      feed.appendChild(element)
-                    })
-                  })
+  Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch_route__["a" /* default */])('/streams', usersList, streamsData => {
+    // always set top level object to its own data property
+    streamsData = streamsData.data
+    // if streamsData, add it to streamerContainers
+    if (streamsData.length) {
+      // append streamsData to each corresponding usersData element
+      streamsData.forEach(stream => {
+        storedUsers.forEach(user => {
+          if (user.id === stream.user_id) {
+            const streamUser = Object.assign({}, user, stream)
+            createStreamerContainer(streamUser, (element, streamUser) => {
+              populateUserData(element, streamUser, (element, streamUser) => {
+                populateStreamData(element, streamUser, (element, steamUser) => {
+                  feed.appendChild(element)
                 })
-              } else {
-                createStreamerContainer(user, (element, user) => {
-                  populateUserData(element, user, function(element) {
-                    feed.appendChild(element)
-                  })
-                })
-              }
+              })
             })
-          })
-        } else {
-          storedUsers.forEach(user => {
+          } else {
             createStreamerContainer(user, (element, user) => {
               populateUserData(element, user, function(element) {
                 feed.appendChild(element)
               })
             })
+          }
+        })
+      })
+    } else {
+      storedUsers.forEach(user => {
+        createStreamerContainer(user, (element, user) => {
+          populateUserData(element, user, function(element) {
+            feed.appendChild(element)
           })
-        }
+        })
       })
     }
   })
@@ -211,65 +199,54 @@ if (storedUsers) {
   // grab key from my server then query for users
   // then query for streams
   // store the user response and date of stream in an array at the key `twitchUsersData`
-  Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_key__["a" /* default */])(endpoint, clientId => {
-    console.log(clientId)
-    if (clientId) {
-      Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["b" /* getUsers */])(usersList, clientId, usersData => {
-        usersData = usersData.data
-        // call getStreams after getUsers
-        // populateStreamerContainer with streamsData and usersData
-        // if no streamData, populateStreamerContainer with usersData only
-        console.log('users list:', usersList, 'getUsers response:', usersData)
-        Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* getStreams */])(usersList, clientId, streamsData => {
-          streamsData = streamsData.data
-          // if streamsData, add it to streamerContainers
-          console.log('getStreams response:', streamsData)
-          console.log('Boolean(streamsData.length)', Boolean(streamsData.length))
-          if (streamsData.length) {
-            // append streamsData to each corresponding usersData element
-            Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData',
-              usersData.map(user => {
-                const curStream = streamsData.filter(stream => {
-                  return user.id === stream.user_id
-                })[0]
-                if (streamsData.filter(stream => user.id === stream.user_id)[0]) {
-                  user.stream = { last_stream: curStream.started_at,
-                    last_stream_id: curStream.id }
-                  const streamingUser = Object.assign(user, { stream: curStream })
-                  createStreamerContainer(streamingUser, (element, streamingUser) => {
-                    console.log('element@createStreamerContainer', streamingUser.user_id, element)
-                    populateUserData(element, streamingUser, (element, streamingUser) => {
-                      console.log('element@populateUserData', streamingUser.user_id, element)
-                      populateStreamData(element, streamingUser, (element, streamingUser) => {
-                        console.log('element@populateStreamData', streamingUser.user_id, element)
-                        feed.appendChild(element)
-                      })
-                    })
+  Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch_route__["a" /* default */])('/users', usersList, usersData => {
+    usersData = usersData.data
+    // call getStreams after getUsers
+    // populateStreamerContainer with streamsData and usersData
+    // if no streamData, populateStreamerContainer with usersData only
+    Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch_route__["a" /* default */])('/streams', usersList, streamsData => {
+      streamsData = streamsData.data
+      // if streamsData, add it to streamerContainers
+      if (streamsData.length) {
+        // append streamsData to each corresponding usersData element
+        Object(__WEBPACK_IMPORTED_MODULE_2__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData',
+          usersData.map(user => {
+            const curStream = streamsData.filter(stream => {
+              return user.id === stream.user_id
+            })[0]
+            if (streamsData.filter(stream => user.id === stream.user_id)[0]) {
+              user.stream = { last_stream: curStream.started_at,
+                last_stream_id: curStream.id }
+              const streamingUser = Object.assign(user, { stream: curStream })
+              createStreamerContainer(streamingUser, (element, streamingUser) => {
+                populateUserData(element, streamingUser, (element, streamingUser) => {
+                  populateStreamData(element, streamingUser, (element, streamingUser) => {
+                    feed.appendChild(element)
                   })
-                } else {
-                  createStreamerContainer(user, (element, user) => {
-                    populateUserData(element, user, function(element) {
-                      feed.appendChild(element)
-                    })
-                  })
-                }
-                return user
+                })
               })
-            )
-          } else {
-            // if no streams data, store and display usersData unmodified
-            Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', usersData)
-            usersData.forEach(user => {
+            } else {
               createStreamerContainer(user, (element, user) => {
                 populateUserData(element, user, function(element) {
                   feed.appendChild(element)
                 })
               })
+            }
+            return user
+          })
+        )
+      } else {
+        // if no streams data, store and display usersData unmodified
+        Object(__WEBPACK_IMPORTED_MODULE_2__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', usersData)
+        usersData.forEach(user => {
+          createStreamerContainer(user, (element, user) => {
+            populateUserData(element, user, function(element) {
+              feed.appendChild(element)
             })
-          }
+          })
         })
-      })
-    }
+      }
+    })
   })
 }
 
@@ -279,28 +256,7 @@ if (storedUsers) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = getKey;
-function getKey(target, fn) {
-  window.fetch(target)
-    .then(res => {
-      return res.text()
-    })
-    .then(key => {
-      fn(key)
-    })
-    .catch(err => {
-      throw new Error(err)
-    })
-}
-
-
-/***/ }),
-/* 2 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return getStreams; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return getUsers; });
+/* harmony export (immutable) */ __webpack_exports__["a"] = fetchTwitchRoute;
 // users endpoint: GET https://api.twitch.tv/helix/users
 // users query params: ?id=<String>&login=<String>
 // user response: data: { display_name: String, id: String, offline_image-url: String, profile_image_url: String }
@@ -313,65 +269,119 @@ function getKey(target, fn) {
 // if user is not streaming, fetch users and display information about user
 
 // constants
-const endpoint = 'https://api.twitch.tv/helix'
+const endpoint = window.env.production
+  ? 'https://sheltered-dusk-25569.herokuapp.com/twitch' : 'http://localhost:3001/twitch'
+
+function lookupUserParam(param) {
+  return typeof +param === 'number' ? 'id' : 'login'
+}
+
+// this fcn should lookup and return a single paramName
+function lookupParamName(route, param) {
+  const paramTable = {
+    '/users': lookupUserParam(param),
+    '/streams': 'user_' + lookupUserParam(param),
+    '/videos': 'user_id',
+    '/search': 'query'
+  }
+  return paramTable[route]
+}
+
+function parseParams(route, params) {
+  if (typeof params === 'object') {
+    const paramsList = params.reduce((acc, param, i, arr) => {
+      const paramName = lookupParamName(route, param)
+      if (i !== 0) {
+        acc += '&'
+      }
+      acc += paramName + '=' + param
+      return acc
+    }, '')
+    return '?' + paramsList
+  } else return `?${lookupParamName(params)}=${params}`
+}
+
+function wtf() {
+  console.log('wtf hapnd?', ...arguments)
+}
+
+function fetchTwitchRoute(route, params, fn) {
+  const target = endpoint + route + parseParams(route, params)
+  const req = new window.Request(target)
+  window.fetch(req)
+    .then(res => {
+      return res.json()
+    })
+    .then(json => {
+      return fn(json)
+    })
+    .catch(err => { // TODO: better err handling. what should I catch?
+      wtf(err)
+    })
+}
+
+// function getUsers(users, key, fn) {
+//   const target = endpoint + '/users?' + parseUsers(users, 'login')
+//   console.log('users target', target)
+//   options.headers['Client-ID'] = key
+//   window.fetch(target, options)
+//     .then(res => {
+//       console.log('res.headers:', res.headers)
+//       return res.json()
+//     })
+//     .then(json => {
+//       fn(json)
+//     })
+//     .catch(err => {
+//       // TODO: better error handling than this
+//       wtf(err)
+//     })
+// }
+//
+// function getStreams(users, key, fn) {
+//   const target = endpoint + '/streams?' + parseUsers(users, 'user_login')
+//   console.log('streams target', target)
+//   options.headers['Client-ID'] = key
+//   window.fetch(target, options)
+//     .then(res => {
+//       return res.json()
+//     })
+//     .then(json => {
+//       fn(json)
+//     })
+//     .catch(err => {
+//       // TODO: better error handling than this
+//       wtf(err)
+//     })
+// }
+
+// export { getStreams, getUsers }
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = liveSearch;
+// constants
+const endpoint = 'https://api.twitch.tv/kraken/search/channels?query='
 const options = {
   Method: 'GET',
   headers: { 'Client-ID': '' }
 }
 
-function parseUsers(users, paramName) {
-  if (typeof users === 'object') {
-    const usersList = users.reduce((acc, user, i, arr) => {
-      if (i !== 0) {
-        acc += '&'
-      }
-      acc += paramName + '=' + user
-      return acc
-    }, '')
-    return usersList
-  } else return `${paramName}=${users}`
-}
-
-function wtf() {
-  console.log('wtf hapnd?', arguments)
-}
-
-function getUsers(users, key, fn) {
-  const target = endpoint + '/users?' + parseUsers(users, 'login')
-  console.log('users target', target)
-  options.headers['Client-ID'] = key
-  window.fetch(target, options)
-    .then(res => {
-      console.log('res.headers:', res.headers)
-      return res.json()
-    })
-    .then(json => {
-      fn(json)
-    })
-    .catch(err => {
-      // TODO: better error handling than this
-      wtf(err)
-    })
-}
-
-function getStreams(users, key, fn) {
-  const target = endpoint + '/streams?' + parseUsers(users, 'user_login')
-  console.log('streams target', target)
-  options.headers['Client-ID'] = key
-  window.fetch(target, options)
+function liveSearch(apiKey, term, fn) {
+  console.log(apiKey)
+  options['Client-ID'] = apiKey
+  window.fetch(`${endpoint}${term}`, options)
     .then(res => {
       return res.json()
     })
     .then(json => {
       fn(json)
     })
-    .catch(err => {
-      // TODO: better error handling than this
-      wtf(err)
-    })
 }
-
-
 
 
 /***/ }),
@@ -416,32 +426,6 @@ function getLocal(key) {
 }
 
 
-
-
-/***/ }),
-/* 4 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = liveSearch;
-// constants
-const endpoint = 'https://api.twitch.tv/kraken/search/channels?query='
-const options = {
-  Method: 'GET',
-  headers: { 'Client-ID': '' }
-}
-
-function liveSearch(apiKey, term, fn) {
-  console.log(apiKey)
-  options['Client-ID'] = apiKey
-  window.fetch(`${endpoint}${term}`, options)
-    .then(res => {
-      return res.json()
-    })
-    .then(json => {
-      fn(json)
-    })
-}
 
 
 /***/ })
