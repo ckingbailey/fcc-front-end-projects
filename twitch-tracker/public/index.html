@@ -135,9 +135,21 @@
     .streamer-link:visited:hover {
       color: var(--blue);
     }
-    .stream-container.is-streaming {
+    .stream-container {
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: flex-start;
+      align-items: stretch;
+    }
+    .current-stream, .prev-stream {
+      flex: 0 1 auto;
       border-radius: var(--border-radius);
       border: 1px solid var(--lt-grey);
+      width: calc(50% - (var(--pad-less) / 2));
+      padding: var(--pad)
+    }
+    .current-stream {
+      margin-right: var(--pad-less);
     }
     </style>
   </head>

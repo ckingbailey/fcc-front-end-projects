@@ -187,8 +187,10 @@ function populateUserData(element, data, fn) {
 }
 
 function populateStreamData(element, data, fn) {
-  element.querySelector('.current-stream').innerText = 'CURRENTLY STREAMING: ' + data.title
-  element.querySelector('.stream-container').classList.add('is-streaming')
+  const ellipsis = data.title.length > 50 ? '...' : ''
+  const streamBlurb = data.title.slice(0, 50)
+  element.querySelector('.current-stream').innerText = 'CURRENTLY STREAMING: ' +
+    streamBlurb + ellipsis
   fn(element, data)
 }
 
