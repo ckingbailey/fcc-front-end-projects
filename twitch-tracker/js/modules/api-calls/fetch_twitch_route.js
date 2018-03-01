@@ -9,45 +9,21 @@
 // fetch streams
 // if user is not streaming, fetch users and display information about user
 
+// dependencies
+import { parseParamsToString } from '../utils/parse'
+
 // constants
 const endpoint = window.env.production
   ? 'https://sheltered-dusk-25569.herokuapp.com/twitch' : 'http://localhost:3001/twitch'
-
-function lookupUserParam(param) {
-  return typeof +param === 'number' ? 'id' : 'login'
-}
-
-// this fcn should lookup and return a single paramName
-function lookupParamName(route, param) {
-  const paramTable = {
-    '/users': lookupUserParam(param),
-    '/streams': 'user_' + lookupUserParam(param),
-    '/videos': 'user_id',
-    '/search': 'query'
-  }
-  return paramTable[route]
-}
-
-function parseParams(route, params) {
-  if (typeof params === 'object') {
-    const paramsList = params.reduce((acc, param, i, arr) => {
-      const paramName = lookupParamName(route, param)
-      if (i !== 0) {
-        acc += '&'
-      }
-      acc += paramName + '=' + param
-      return acc
-    }, '')
-    return '?' + paramsList
-  } else return `?${lookupParamName(params)}=${params}`
-}
 
 function wtf() {
   console.log('wtf hapnd?', ...arguments)
 }
 
 export default function fetchTwitchRoute(route, params, fn) {
-  const target = endpoint + route + parseParams(route, params)
+  console.log('args to fetchTwitch', route, params)
+  const target = endpoint + route + parseParamsToString(route, params)
+  console.log('fetchTwitch target', target)
   const req = new window.Request(target)
   window.fetch(req)
     .then(res => {

@@ -71,7 +71,9 @@
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch_route__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__search__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__api_calls_storage_js__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_parse__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__ = __webpack_require__(3);
+
 
 
  // NOTE: getLocal|setLocal stringifies|parse value for you
@@ -156,9 +158,10 @@ function populateStreamData(element, data, fn) {
 // onload, load Twitch user data
 // first look to localStorage
 // if nothing in localStorage, qry server for data from Twitch
-const storedUsers = Object(__WEBPACK_IMPORTED_MODULE_2__api_calls_storage_js__["a" /* getLocal */])('twitchUsersData')
+const storedUsers = Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["a" /* getLocal */])('twitchUsersData')
 if (storedUsers) {
-  Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch_route__["a" /* default */])('/streams', usersList, streamsData => {
+  const usersLogins = Object(__WEBPACK_IMPORTED_MODULE_2__utils_parse__["a" /* parseKeysToArray */])(storedUsers, 'login')
+  Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch_route__["a" /* default */])('/streams?', usersLogins, streamsData => {
     // always set top level object to its own data property
     streamsData = streamsData.data
     // if streamsData, add it to streamerContainers
@@ -166,29 +169,35 @@ if (storedUsers) {
       // append streamsData to each corresponding usersData element
       streamsData.forEach(stream => {
         storedUsers.forEach(user => {
-          if (user.id === stream.user_id) {
-            const streamUser = Object.assign({}, user, stream)
-            createStreamerContainer(streamUser, (element, streamUser) => {
-              populateUserData(element, streamUser, (element, streamUser) => {
-                populateStreamData(element, streamUser, (element, steamUser) => {
+          Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch_route__["a" /* default */])('/videos?first=1&', user.id, videosData => {
+            console.log(videosData)
+            if (user.id === stream.user_id) {
+              const streamUser = Object.assign({}, user, stream)
+              createStreamerContainer(streamUser, (element, streamUser) => {
+                populateUserData(element, streamUser, (element, streamUser) => {
+                  populateStreamData(element, streamUser, (element, steamUser) => {
+                    feed.appendChild(element)
+                  })
+                })
+              })
+            } else {
+              createStreamerContainer(user, (element, user) => {
+                populateUserData(element, user, function(element) {
                   feed.appendChild(element)
                 })
               })
-            })
-          } else {
-            createStreamerContainer(user, (element, user) => {
-              populateUserData(element, user, function(element) {
-                feed.appendChild(element)
-              })
-            })
-          }
+            }
+          })
         })
       })
     } else {
       storedUsers.forEach(user => {
-        createStreamerContainer(user, (element, user) => {
-          populateUserData(element, user, function(element) {
-            feed.appendChild(element)
+        Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch_route__["a" /* default */])('/videos?first=1&', user.id, videosData => {
+          console.log(videosData)
+          createStreamerContainer(user, (element, user) => {
+            populateUserData(element, user, function(element) {
+              feed.appendChild(element)
+            })
           })
         })
       })
@@ -199,17 +208,17 @@ if (storedUsers) {
   // grab key from my server then query for users
   // then query for streams
   // store the user response and date of stream in an array at the key `twitchUsersData`
-  Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch_route__["a" /* default */])('/users', usersList, usersData => {
+  Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch_route__["a" /* default */])('/users?', usersList, usersData => {
     usersData = usersData.data
     // call getStreams after getUsers
     // populateStreamerContainer with streamsData and usersData
     // if no streamData, populateStreamerContainer with usersData only
-    Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch_route__["a" /* default */])('/streams', usersList, streamsData => {
+    Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch_route__["a" /* default */])('/streams?', usersList, streamsData => {
       streamsData = streamsData.data
       // if streamsData, add it to streamerContainers
       if (streamsData.length) {
         // append streamsData to each corresponding usersData element
-        Object(__WEBPACK_IMPORTED_MODULE_2__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData',
+        Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData',
           usersData.map(user => {
             const curStream = streamsData.filter(stream => {
               return user.id === stream.user_id
@@ -237,7 +246,7 @@ if (storedUsers) {
         )
       } else {
         // if no streams data, store and display usersData unmodified
-        Object(__WEBPACK_IMPORTED_MODULE_2__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', usersData)
+        Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', usersData)
         usersData.forEach(user => {
           createStreamerContainer(user, (element, user) => {
             populateUserData(element, user, function(element) {
@@ -257,6 +266,7 @@ if (storedUsers) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = fetchTwitchRoute;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_parse__ = __webpack_require__(4);
 // users endpoint: GET https://api.twitch.tv/helix/users
 // users query params: ?id=<String>&login=<String>
 // user response: data: { display_name: String, id: String, offline_image-url: String, profile_image_url: String }
@@ -268,45 +278,21 @@ if (storedUsers) {
 // fetch streams
 // if user is not streaming, fetch users and display information about user
 
+// dependencies
+
+
 // constants
 const endpoint = window.env.production
   ? 'https://sheltered-dusk-25569.herokuapp.com/twitch' : 'http://localhost:3001/twitch'
-
-function lookupUserParam(param) {
-  return typeof +param === 'number' ? 'id' : 'login'
-}
-
-// this fcn should lookup and return a single paramName
-function lookupParamName(route, param) {
-  const paramTable = {
-    '/users': lookupUserParam(param),
-    '/streams': 'user_' + lookupUserParam(param),
-    '/videos': 'user_id',
-    '/search': 'query'
-  }
-  return paramTable[route]
-}
-
-function parseParams(route, params) {
-  if (typeof params === 'object') {
-    const paramsList = params.reduce((acc, param, i, arr) => {
-      const paramName = lookupParamName(route, param)
-      if (i !== 0) {
-        acc += '&'
-      }
-      acc += paramName + '=' + param
-      return acc
-    }, '')
-    return '?' + paramsList
-  } else return `?${lookupParamName(params)}=${params}`
-}
 
 function wtf() {
   console.log('wtf hapnd?', ...arguments)
 }
 
 function fetchTwitchRoute(route, params, fn) {
-  const target = endpoint + route + parseParams(route, params)
+  console.log('args to fetchTwitch', route, params)
+  const target = endpoint + route + Object(__WEBPACK_IMPORTED_MODULE_0__utils_parse__["b" /* parseParamsToString */])(route, params)
+  console.log('fetchTwitch target', target)
   const req = new window.Request(target)
   window.fetch(req)
     .then(res => {
@@ -423,6 +409,68 @@ function getLocal(key) {
   } else {
     return JSON.parse(item)
   }
+}
+
+
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return parseKeysToArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return parseParamsToString; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lookup__ = __webpack_require__(5);
+
+
+function parseKeysToArray(data, key) {
+  return data.map(obj => {
+    return obj[key]
+  })
+}
+
+function parseParamsToString(route, params) {
+  if (route.includes('?')) {
+    route = route.slice(0, route.indexOf('?'))
+    console.log('route included "?"', route)
+  }
+  if (typeof params === 'object') {
+    const paramsList = params.reduce((acc, param, i, arr) => {
+      const paramName = Object(__WEBPACK_IMPORTED_MODULE_0__lookup__["a" /* lookupParamName */])(route, param)
+      if (i !== 0) {
+        acc += '&'
+      }
+      acc += paramName + '=' + param
+      return acc
+    }, '')
+    return paramsList
+  } else return `${Object(__WEBPACK_IMPORTED_MODULE_0__lookup__["a" /* lookupParamName */])(route, params)}=${params}`
+}
+
+
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return lookupParamName; });
+// is it a user login or is it a user id?
+function lookupUserParam(param) {
+  return typeof +param === 'number' ? 'id' : 'login'
+}
+
+// lookup and return a single paramName
+function lookupParamName(route, param) {
+  const paramTable = {
+    '/users': lookupUserParam(param),
+    '/streams': 'user_' + lookupUserParam(param),
+    '/videos': 'user_id',
+    '/search': 'query'
+  }
+  return paramTable[route]
 }
 
 

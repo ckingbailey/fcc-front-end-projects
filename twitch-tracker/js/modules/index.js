@@ -1,5 +1,6 @@
 import fetchTwitchRoute from './api-calls/fetch_twitch_route'
 import liveSearch from './search'
+import { parseKeysToArray } from './utils/parse'
 import { setLocal, getLocal } from './api-calls/storage.js' // NOTE: getLocal|setLocal stringifies|parse value for you
 
 // constants
@@ -84,7 +85,8 @@ function populateStreamData(element, data, fn) {
 // if nothing in localStorage, qry server for data from Twitch
 const storedUsers = getLocal('twitchUsersData')
 if (storedUsers) {
-  fetchTwitchRoute('/streams', usersList, streamsData => {
+  const usersLogins = parseKeysToArray(storedUsers, 'login')
+  fetchTwitchRoute('/streams?', usersLogins, streamsData => {
     // always set top level object to its own data property
     streamsData = streamsData.data
     // if streamsData, add it to streamerContainers
@@ -92,29 +94,35 @@ if (storedUsers) {
       // append streamsData to each corresponding usersData element
       streamsData.forEach(stream => {
         storedUsers.forEach(user => {
-          if (user.id === stream.user_id) {
-            const streamUser = Object.assign({}, user, stream)
-            createStreamerContainer(streamUser, (element, streamUser) => {
-              populateUserData(element, streamUser, (element, streamUser) => {
-                populateStreamData(element, streamUser, (element, steamUser) => {
+          fetchTwitchRoute('/videos?first=1&', user.id, videosData => {
+            console.log(videosData)
+            if (user.id === stream.user_id) {
+              const streamUser = Object.assign({}, user, stream)
+              createStreamerContainer(streamUser, (element, streamUser) => {
+                populateUserData(element, streamUser, (element, streamUser) => {
+                  populateStreamData(element, streamUser, (element, steamUser) => {
+                    feed.appendChild(element)
+                  })
+                })
+              })
+            } else {
+              createStreamerContainer(user, (element, user) => {
+                populateUserData(element, user, function(element) {
                   feed.appendChild(element)
                 })
               })
-            })
-          } else {
-            createStreamerContainer(user, (element, user) => {
-              populateUserData(element, user, function(element) {
-                feed.appendChild(element)
-              })
-            })
-          }
+            }
+          })
         })
       })
     } else {
       storedUsers.forEach(user => {
-        createStreamerContainer(user, (element, user) => {
-          populateUserData(element, user, function(element) {
-            feed.appendChild(element)
+        fetchTwitchRoute('/videos?first=1&', user.id, videosData => {
+          console.log(videosData)
+          createStreamerContainer(user, (element, user) => {
+            populateUserData(element, user, function(element) {
+              feed.appendChild(element)
+            })
           })
         })
       })
@@ -125,12 +133,12 @@ if (storedUsers) {
   // grab key from my server then query for users
   // then query for streams
   // store the user response and date of stream in an array at the key `twitchUsersData`
-  fetchTwitchRoute('/users', usersList, usersData => {
+  fetchTwitchRoute('/users?', usersList, usersData => {
     usersData = usersData.data
     // call getStreams after getUsers
     // populateStreamerContainer with streamsData and usersData
     // if no streamData, populateStreamerContainer with usersData only
-    fetchTwitchRoute('/streams', usersList, streamsData => {
+    fetchTwitchRoute('/streams?', usersList, streamsData => {
       streamsData = streamsData.data
       // if streamsData, add it to streamerContainers
       if (streamsData.length) {
