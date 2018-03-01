@@ -21,15 +21,18 @@ function wtf() {
 }
 
 export default function fetchTwitchRoute(route, params, fn) {
-  console.log('args to fetchTwitch', route, params)
+  // console.log('args to fetchTwitch', route, params)
   const target = endpoint + route + parseParamsToString(route, params)
-  console.log('fetchTwitch target', target)
+  // console.log('fetchTwitch target', target)
   const req = new window.Request(target)
   window.fetch(req)
     .then(res => {
       return res.json()
     })
     .then(json => {
+      if (route.includes('streams')) {
+        console.log('streams response', target, json)
+      }
       return fn(json)
     })
     .catch(err => { // TODO: better err handling. what should I catch?

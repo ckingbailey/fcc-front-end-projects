@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "/Users/ckingbailey/Sites/git/fcc-front-end/twitch-tracker/public/js";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 1);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -68,11 +68,48 @@
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return parseKeysToArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return parseParamsToString; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lookup__ = __webpack_require__(3);
+
+
+function parseKeysToArray(data, key) {
+  return data.map(obj => {
+    return obj[key]
+  })
+}
+
+function parseParamsToString(route, params) {
+  if (route.includes('?')) {
+    route = route.slice(0, route.indexOf('?'))
+    // console.log('route included "?"', route)
+  }
+  if (typeof params === 'object') {
+    const paramsList = params.reduce((acc, param, i, arr) => {
+      const paramName = Object(__WEBPACK_IMPORTED_MODULE_0__lookup__["a" /* lookupParamName */])(route, param)
+      if (i !== 0) {
+        acc += '&'
+      }
+      acc += paramName + '=' + param
+      return acc
+    }, '')
+    return paramsList
+  } else return `${Object(__WEBPACK_IMPORTED_MODULE_0__lookup__["a" /* lookupParamName */])(route, params)}=${params}`
+}
+
+
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch_route__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__search__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_parse__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch_route__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__search__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_parse__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__ = __webpack_require__(5);
 
 
 
@@ -160,6 +197,7 @@ function populateStreamData(element, data, fn) {
 // if nothing in localStorage, qry server for data from Twitch
 const storedUsers = Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["a" /* getLocal */])('twitchUsersData')
 if (storedUsers) {
+  console.log('storedUsers condition')
   const usersLogins = Object(__WEBPACK_IMPORTED_MODULE_2__utils_parse__["a" /* parseKeysToArray */])(storedUsers, 'login')
   Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch_route__["a" /* default */])('/streams?', usersLogins, streamsData => {
     // always set top level object to its own data property
@@ -204,6 +242,7 @@ if (storedUsers) {
     }
   })
 } else {
+  console.log('!storedUsers condition')
   // if no stored users
   // grab key from my server then query for users
   // then query for streams
@@ -261,12 +300,12 @@ if (storedUsers) {
 
 
 /***/ }),
-/* 1 */
+/* 2 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = fetchTwitchRoute;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_parse__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_parse__ = __webpack_require__(0);
 // users endpoint: GET https://api.twitch.tv/helix/users
 // users query params: ?id=<String>&login=<String>
 // user response: data: { display_name: String, id: String, offline_image-url: String, profile_image_url: String }
@@ -290,15 +329,18 @@ function wtf() {
 }
 
 function fetchTwitchRoute(route, params, fn) {
-  console.log('args to fetchTwitch', route, params)
+  // console.log('args to fetchTwitch', route, params)
   const target = endpoint + route + Object(__WEBPACK_IMPORTED_MODULE_0__utils_parse__["b" /* parseParamsToString */])(route, params)
-  console.log('fetchTwitch target', target)
+  // console.log('fetchTwitch target', target)
   const req = new window.Request(target)
   window.fetch(req)
     .then(res => {
       return res.json()
     })
     .then(json => {
+      if (route.includes('streams')) {
+        console.log('streams response', target, json)
+      }
       return fn(json)
     })
     .catch(err => { // TODO: better err handling. what should I catch?
@@ -345,7 +387,32 @@ function fetchTwitchRoute(route, params, fn) {
 
 
 /***/ }),
-/* 2 */
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return lookupParamName; });
+// is it a user login or is it a user id?
+function lookupUserParam(param) {
+  return +param ? 'id' : 'login'
+}
+
+// lookup and return a single paramName
+function lookupParamName(route, param) {
+  const paramTable = {
+    '/users': lookupUserParam(param),
+    '/streams': 'user_' + lookupUserParam(param),
+    '/videos': 'user_id',
+    '/search': 'query'
+  }
+  return paramTable[route]
+}
+
+
+
+
+/***/ }),
+/* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -371,7 +438,7 @@ function liveSearch(apiKey, term, fn) {
 
 
 /***/ }),
-/* 3 */
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -409,68 +476,6 @@ function getLocal(key) {
   } else {
     return JSON.parse(item)
   }
-}
-
-
-
-
-/***/ }),
-/* 4 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return parseKeysToArray; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return parseParamsToString; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lookup__ = __webpack_require__(5);
-
-
-function parseKeysToArray(data, key) {
-  return data.map(obj => {
-    return obj[key]
-  })
-}
-
-function parseParamsToString(route, params) {
-  if (route.includes('?')) {
-    route = route.slice(0, route.indexOf('?'))
-    console.log('route included "?"', route)
-  }
-  if (typeof params === 'object') {
-    const paramsList = params.reduce((acc, param, i, arr) => {
-      const paramName = Object(__WEBPACK_IMPORTED_MODULE_0__lookup__["a" /* lookupParamName */])(route, param)
-      if (i !== 0) {
-        acc += '&'
-      }
-      acc += paramName + '=' + param
-      return acc
-    }, '')
-    return paramsList
-  } else return `${Object(__WEBPACK_IMPORTED_MODULE_0__lookup__["a" /* lookupParamName */])(route, params)}=${params}`
-}
-
-
-
-
-/***/ }),
-/* 5 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return lookupParamName; });
-// is it a user login or is it a user id?
-function lookupUserParam(param) {
-  return typeof +param === 'number' ? 'id' : 'login'
-}
-
-// lookup and return a single paramName
-function lookupParamName(route, param) {
-  const paramTable = {
-    '/users': lookupUserParam(param),
-    '/streams': 'user_' + lookupUserParam(param),
-    '/videos': 'user_id',
-    '/search': 'query'
-  }
-  return paramTable[route]
 }
 
 

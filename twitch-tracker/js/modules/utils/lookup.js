@@ -1,6 +1,6 @@
 // is it a user login or is it a user id?
 function lookupUserParam(param) {
-  return typeof +param === 'number' ? 'id' : 'login'
+  return +param ? 'id' : 'login'
 }
 
 // lookup and return a single paramName

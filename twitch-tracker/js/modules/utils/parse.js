@@ -9,7 +9,7 @@ function parseKeysToArray(data, key) {
 function parseParamsToString(route, params) {
   if (route.includes('?')) {
     route = route.slice(0, route.indexOf('?'))
-    console.log('route included "?"', route)
+    // console.log('route included "?"', route)
   }
   if (typeof params === 'object') {
     const paramsList = params.reduce((acc, param, i, arr) => {

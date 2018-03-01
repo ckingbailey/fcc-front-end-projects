@@ -85,6 +85,7 @@ function populateStreamData(element, data, fn) {
 // if nothing in localStorage, qry server for data from Twitch
 const storedUsers = getLocal('twitchUsersData')
 if (storedUsers) {
+  console.log('storedUsers condition')
   const usersLogins = parseKeysToArray(storedUsers, 'login')
   fetchTwitchRoute('/streams?', usersLogins, streamsData => {
     // always set top level object to its own data property
@@ -129,6 +130,7 @@ if (storedUsers) {
     }
   })
 } else {
+  console.log('!storedUsers condition')
   // if no stored users
   // grab key from my server then query for users
   // then query for streams
