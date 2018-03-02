@@ -182,12 +182,31 @@ function populateStreamData(element, data, fn) {
   const streamBlurb =
     (data.cur_stream &&
     data.cur_stream.title)
-      ? 'CURRENTLY STREAMING: ' + data.cur_stream.title.slice(0, 50) +
+      ? data.cur_stream.title.slice(0, 50) +
         (data.cur_stream.title.length > 50 ? '...' : '') : 'OFFLINE'
-  const lastStream = data.last_stream
-    ? 'LAST STREAM: ' + (new Date(data.last_stream.published_at)) : 'no videos found'
-  element.querySelector('.current-stream').innerText = streamBlurb
-  element.querySelector('.prev-stream').innerText = lastStream
+  const lastStreamDate = data.last_stream && new Date(data.last_stream.published_at)
+  const curStream = element.querySelector('.current-stream')
+  const prevStream = element.querySelector('.prev-stream')
+  if (data.cur_stream) {
+    curStream.appendChild(document.createElement('i'))
+    curStream.firstChild.innerText = 'CURRENTLY STREAMING: '
+    curStream.appendChild(document.createTextNode(streamBlurb))
+  } else {
+    curStream.classList.add('offline')
+    curStream.appendChild(document.createElement('span'))
+    curStream.firstChild.innerText = 'OFFLINE'
+  }
+  if (data.last_stream) {
+    prevStream.appendChild(document.createElement('i'))
+    prevStream.firstChild.innerText = 'LAST STREAM: '
+    prevStream.appendChild(document.createTextNode(data.last_stream.title.slice(0, 50)))
+    prevStream.appendChild(document.createElement('br'))
+    prevStream.appendChild(document.createTextNode(`${lastStreamDate.toDateString()}, ${lastStreamDate.toLocaleTimeString()}`))
+  } else {
+    prevStream.classList.add('no-videos')
+    prevStream.appendChild(document.createElement('span'))
+    prevStream.firstChild.innerText = 'no videos found'
+  }
   fn(element, data)
 }
 

@@ -151,6 +151,13 @@
     .current-stream {
       margin-right: var(--pad-less);
     }
+    .current-stream.offline, .prev-stream.no-videos {
+      text-align: center;
+    }
+    .current-stream.offline span, .prev-stream.no-videos span {
+      position: relative;
+      top: calc(50% - .625rem);
+    }
     </style>
   </head>
   <body>
