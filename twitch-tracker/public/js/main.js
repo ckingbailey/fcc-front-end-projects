@@ -177,6 +177,7 @@ function populateUserData(element, data, fn) {
 }
 
 function populateStreamData(element, data, fn) {
+  console.log('args to popStrmData', data)
   // I know, I'm sorry, this is a somewhat icky nested ternary. am I sorry? I'm not sorry
   const streamBlurb =
     (data.cur_stream &&
@@ -184,7 +185,7 @@ function populateStreamData(element, data, fn) {
       ? 'CURRENTLY STREAMING: ' + data.cur_stream.title.slice(0, 50) +
         (data.cur_stream.title.length > 50 ? '...' : '') : 'OFFLINE'
   const lastStream = data.last_stream
-    ? 'LAST STREAM: ' + Date(data.last_stream.published_at) : 'no videos found'
+    ? 'LAST STREAM: ' + (new Date(data.last_stream.published_at)) : 'no videos found'
   element.querySelector('.current-stream').innerText = streamBlurb
   element.querySelector('.prev-stream').innerText = lastStream
   fn(element, data)
@@ -235,9 +236,12 @@ if (storedUsers) {
       storedUsers.forEach(user => {
         Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch_route__["a" /* default */])('/videos?first=1&', user.id, videosData => {
           console.log(user.id, videosData)
+          user.last_stream = videosData.data[0]
           createStreamerContainer(user, (element, user) => {
             populateUserData(element, user, (element) => {
-              feed.appendChild(element)
+              populateStreamData(element, user, (element) => {
+                feed.appendChild(element)
+              })
             })
           })
         })
