@@ -78,10 +78,13 @@ function populateUserData(element, data, fn) {
 }
 
 function populateStreamData(element, data, fn) {
-  const ellipsis = data.cur_stream.title.length > 50 ? '...' : ''
-  const streamBlurb = data.cur_stream.title.slice(0, 50)
-  element.querySelector('.current-stream').innerText = 'CURRENTLY STREAMING: ' +
-    streamBlurb + ellipsis
+  // I know, I'm sorry, this is a somewhat icky nested ternary. am I sorry? I'm not sorry
+  const streamBlurb =
+    (data.cur_stream &&
+    data.cur_stream.title)
+      ? 'CURRENTLY STREAMING: ' + data.cur_stream.title.slice(0, 50) +
+        (data.cur_stream.title.length > 50 ? '...' : '') : 'OFFLINE'
+  element.querySelector('.current-stream').innerText = streamBlurb
   fn(element, data)
 }
 
@@ -113,7 +116,7 @@ if (storedUsers) {
                 })
               })
             } else {
-              user.cur_stream = noStream
+              user.cur_stream = null
               createStreamerContainer(user, (element, user) => {
                 populateUserData(element, user, (element, user) => {
                   populateStreamData(element, user, (element) => {
@@ -176,7 +179,7 @@ if (storedUsers) {
                   })
                 })
               } else {
-                user.cur_stream = noStream
+                user.cur_stream = null
                 createStreamerContainer(user, (element, user) => {
                   populateUserData(element, user, (element, user) => {
                     populateStreamData(element, user, (element) => {
