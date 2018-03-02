@@ -128,9 +128,6 @@ const searchForm = document.getElementById('searchForm')
 searchForm.addEventListener('submit', handleSearchSubmit)
 const searchField = document.getElementById('searchField')
 searchField.addEventListener('input', handleSearchInput)
-const noStream = {
-  title: 'OFFLINE'
-}
 
 function handleSearchSubmit(ev) {
   ev.preventDefault()
@@ -186,7 +183,10 @@ function populateStreamData(element, data, fn) {
     data.cur_stream.title)
       ? 'CURRENTLY STREAMING: ' + data.cur_stream.title.slice(0, 50) +
         (data.cur_stream.title.length > 50 ? '...' : '') : 'OFFLINE'
+  const lastStream = data.last_stream
+    ? 'LAST STREAM: ' + Date(data.last_stream.published_at) : 'no videos found'
   element.querySelector('.current-stream').innerText = streamBlurb
+  element.querySelector('.prev-stream').innerText = lastStream
   fn(element, data)
 }
 
@@ -204,7 +204,7 @@ if (storedUsers) {
         // fetch video for each user because Twitch only lets me get one at a time
         Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch_route__["a" /* default */])('/videos?first=1&', user.id, videosData => {
           console.log(user.id, videosData)
-          user.last_stream = videosData.data.length ? videosData.data[0] : 'no videos found'
+          user.last_stream = videosData.data[0]
           // for each stored user, iterate over streamsData checking for id match
           streamsData.data.forEach(stream => {
             // if it's a match, add the stream data and append element to DOM
@@ -259,7 +259,7 @@ if (storedUsers) {
           Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch_route__["a" /* default */])('/videos?first=1&', user.id, videosData => {
             console.log(user.id, videosData)
             // TODO: validate that extant .last_stream is older than videosData.data[0]
-            user.last_stream = videosData.data.length ? videosData.data[0] : 'no videos found'
+            user.last_stream = videosData.data[0]
             const oldUsersData = Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["a" /* getLocal */])('twitchUsersData')
             // if current user exists in storage replace it with new data
             if (oldUsersData) {
@@ -300,7 +300,7 @@ if (storedUsers) {
           Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch_route__["a" /* default */])('/videos?first=1&', user.id, videosData => {
             console.log(user.id, videosData)
             // TODO: validate that stored .last_stream is older than videosData.data[0]
-            user.last_stream = videosData.data.length ? videosData.data[0] : 'no videos found'
+            user.last_stream = videosData.data[0]
             const oldUsersData = Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["a" /* getLocal */])('twitchUsersData')
             // if current user exists in storage replace it with new data
             if (oldUsersData) {
