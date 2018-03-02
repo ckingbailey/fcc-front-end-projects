@@ -1,5 +1,4 @@
-import fetchTwitchRoute from './api-calls/fetch_twitch_route'
-import liveSearch from './search'
+import fetchTwitchRoute, { searchTwitch } from './api-calls/fetch_twitch'
 import { parseKeysToArray } from './utils/parse'
 import { setLocal, getLocal } from './api-calls/storage.js' // NOTE: getLocal|setLocal stringifies|parse value for you
 
@@ -14,20 +13,15 @@ console.log('isProd? ' + isProd, 'api endpoint: ' + endpoint)
 const feed = document.getElementById('feed')
 const searchForm = document.getElementById('searchForm')
 searchForm.addEventListener('submit', handleSearchSubmit)
-const searchField = document.getElementById('searchField')
-searchField.addEventListener('input', handleSearchInput)
+const submitBtn = document.getElementById('submitSearch')
 
 function handleSearchSubmit(ev) {
   ev.preventDefault()
-  console.log(ev.target)
-}
-
-function handleSearchInput(ev) {
-  console.log(ev.target.value)
-  if (ev.target.value.length > 1) {
-    liveSearch(ev.target.value, data => {
-      console.log(data)
-    })
+  const term = ev.target.children['searchField'].value
+  if (term) {
+    console.log(term)
+    searchTwitch(term, response => console.log(response))
+    submitBtn.blur()
   }
 }
 
@@ -65,7 +59,6 @@ function populateUserData(element, data, fn) {
 }
 
 function populateStreamData(element, data, fn) {
-  console.log('args to popStrmData', data)
   // I know, I'm sorry, this is a somewhat icky nested ternary. am I sorry? I'm not sorry
   const streamBlurb =
     (data.cur_stream &&
@@ -103,15 +96,12 @@ function populateStreamData(element, data, fn) {
 // if nothing in localStorage, qry server for data from Twitch
 const storedUsers = getLocal('twitchUsersData')
 if (storedUsers) {
-  console.log('storedUsers condition')
   fetchTwitchRoute('/streams?', parseKeysToArray(storedUsers, 'login'), streamsData => {
     if (streamsData.data.length) {
-      console.log('streamsData condition')
       // if streamsData, iterate over each obj in the response looking for user matches
       storedUsers.forEach(user => {
         // fetch video for each user because Twitch only lets me get one at a time
         fetchTwitchRoute('/videos?first=1&', user.id, videosData => {
-          console.log(user.id, videosData)
           user.last_stream = videosData.data[0]
           // for each stored user, iterate over streamsData checking for id match
           streamsData.data.forEach(stream => {
@@ -139,10 +129,8 @@ if (storedUsers) {
         })
       })
     } else {
-      console.log('!streamsData condition')
       storedUsers.forEach(user => {
         fetchTwitchRoute('/videos?first=1&', user.id, videosData => {
-          console.log(user.id, videosData)
           user.last_stream = videosData.data[0]
           createStreamerContainer(user, (element, user) => {
             populateUserData(element, user, (element) => {
@@ -156,19 +144,16 @@ if (storedUsers) {
     }
   })
 } else {
-  console.log('!storedUsers condition')
   // if no stored users qry server to qry Twitch for users
   // then query for streams
   // store the user response and most recent video in an array at the key `twitchUsersData`
   fetchTwitchRoute('/users?', usersList, usersData => {
     fetchTwitchRoute('/streams?', parseKeysToArray(usersData.data, 'login'), streamsData => {
       if (streamsData.data.length) {
-        console.log('streamsData condition')
         // if streamsData, iterate over each obj in the response looking for user matches
         usersData.data.forEach(user => {
           // fetch video for each user because Twitch only lets me get one at a time
           fetchTwitchRoute('/videos?first=1&', user.id, videosData => {
-            console.log(user.id, videosData)
             // TODO: validate that extant .last_stream is older than videosData.data[0]
             user.last_stream = videosData.data[0]
             const oldUsersData = getLocal('twitchUsersData')
@@ -209,7 +194,6 @@ if (storedUsers) {
         usersData.data.forEach(user => {
           // fetch video for each user because Twitch only lets me get one at a time
           fetchTwitchRoute('/videos?first=1&', user.id, videosData => {
-            console.log(user.id, videosData)
             // TODO: validate that stored .last_stream is older than videosData.data[0]
             user.last_stream = videosData.data[0]
             const oldUsersData = getLocal('twitchUsersData')

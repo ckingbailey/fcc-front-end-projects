@@ -40,39 +40,17 @@ export default function fetchTwitchRoute(route, params, fn) {
     })
 }
 
-// function getUsers(users, key, fn) {
-//   const target = endpoint + '/users?' + parseUsers(users, 'login')
-//   console.log('users target', target)
-//   options.headers['Client-ID'] = key
-//   window.fetch(target, options)
-//     .then(res => {
-//       console.log('res.headers:', res.headers)
-//       return res.json()
-//     })
-//     .then(json => {
-//       fn(json)
-//     })
-//     .catch(err => {
-//       // TODO: better error handling than this
-//       wtf(err)
-//     })
-// }
-//
-// function getStreams(users, key, fn) {
-//   const target = endpoint + '/streams?' + parseUsers(users, 'user_login')
-//   console.log('streams target', target)
-//   options.headers['Client-ID'] = key
-//   window.fetch(target, options)
-//     .then(res => {
-//       return res.json()
-//     })
-//     .then(json => {
-//       fn(json)
-//     })
-//     .catch(err => {
-//       // TODO: better error handling than this
-//       wtf(err)
-//     })
-// }
+function searchTwitch(term, fn) {
+  const target = endpoint + '/search/channels?' + parseParamsToString('/search', term)
+  const req = new window.Request(target)
+  console.log('search target:', target)
+  window.fetch(req)
+    .then(res => {
+      return res.json()
+    })
+    .then(json => {
+      fn(json)
+    })
+}
 
-// export { getStreams, getUsers }
+export { searchTwitch }

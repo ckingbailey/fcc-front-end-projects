@@ -37,7 +37,7 @@ app.use((req, res, next) => {
 
 // all twitch route query one of two twitch APIs, handler returns results to client
 twitchRouter
-  .get(['/users', '/streams', '/videos', '/search'], (req, res, next) => {
+  .get(['/users', '/streams', '/videos', '/search/channels'], (req, res, next) => {
     console.log('I\'m listening')
     // TODO: authenticate the request params before sending them on
     fetchTwitch(req, res)

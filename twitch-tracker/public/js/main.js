@@ -106,11 +106,9 @@ function parseParamsToString(route, params) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch_route__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__search__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_parse__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__ = __webpack_require__(5);
-
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils_parse__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__api_calls_storage_js__ = __webpack_require__(5);
 
 
  // NOTE: getLocal|setLocal stringifies|parse value for you
@@ -126,20 +124,15 @@ console.log('isProd? ' + isProd, 'api endpoint: ' + endpoint)
 const feed = document.getElementById('feed')
 const searchForm = document.getElementById('searchForm')
 searchForm.addEventListener('submit', handleSearchSubmit)
-const searchField = document.getElementById('searchField')
-searchField.addEventListener('input', handleSearchInput)
+const submitBtn = document.getElementById('submitSearch')
 
 function handleSearchSubmit(ev) {
   ev.preventDefault()
-  console.log(ev.target)
-}
-
-function handleSearchInput(ev) {
-  console.log(ev.target.value)
-  if (ev.target.value.length > 1) {
-    Object(__WEBPACK_IMPORTED_MODULE_1__search__["a" /* default */])(ev.target.value, data => {
-      console.log(data)
-    })
+  const term = ev.target.children['searchField'].value
+  if (term) {
+    console.log(term)
+    Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch__["b" /* searchTwitch */])(term, response => console.log(response))
+    submitBtn.blur()
   }
 }
 
@@ -177,7 +170,6 @@ function populateUserData(element, data, fn) {
 }
 
 function populateStreamData(element, data, fn) {
-  console.log('args to popStrmData', data)
   // I know, I'm sorry, this is a somewhat icky nested ternary. am I sorry? I'm not sorry
   const streamBlurb =
     (data.cur_stream &&
@@ -213,17 +205,14 @@ function populateStreamData(element, data, fn) {
 // onload, load Twitch user data
 // first look to localStorage
 // if nothing in localStorage, qry server for data from Twitch
-const storedUsers = Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["a" /* getLocal */])('twitchUsersData')
+const storedUsers = Object(__WEBPACK_IMPORTED_MODULE_2__api_calls_storage_js__["a" /* getLocal */])('twitchUsersData')
 if (storedUsers) {
-  console.log('storedUsers condition')
-  Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch_route__["a" /* default */])('/streams?', Object(__WEBPACK_IMPORTED_MODULE_2__utils_parse__["a" /* parseKeysToArray */])(storedUsers, 'login'), streamsData => {
+  Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch__["a" /* default */])('/streams?', Object(__WEBPACK_IMPORTED_MODULE_1__utils_parse__["a" /* parseKeysToArray */])(storedUsers, 'login'), streamsData => {
     if (streamsData.data.length) {
-      console.log('streamsData condition')
       // if streamsData, iterate over each obj in the response looking for user matches
       storedUsers.forEach(user => {
         // fetch video for each user because Twitch only lets me get one at a time
-        Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch_route__["a" /* default */])('/videos?first=1&', user.id, videosData => {
-          console.log(user.id, videosData)
+        Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch__["a" /* default */])('/videos?first=1&', user.id, videosData => {
           user.last_stream = videosData.data[0]
           // for each stored user, iterate over streamsData checking for id match
           streamsData.data.forEach(stream => {
@@ -251,10 +240,8 @@ if (storedUsers) {
         })
       })
     } else {
-      console.log('!streamsData condition')
       storedUsers.forEach(user => {
-        Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch_route__["a" /* default */])('/videos?first=1&', user.id, videosData => {
-          console.log(user.id, videosData)
+        Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch__["a" /* default */])('/videos?first=1&', user.id, videosData => {
           user.last_stream = videosData.data[0]
           createStreamerContainer(user, (element, user) => {
             populateUserData(element, user, (element) => {
@@ -268,30 +255,27 @@ if (storedUsers) {
     }
   })
 } else {
-  console.log('!storedUsers condition')
   // if no stored users qry server to qry Twitch for users
   // then query for streams
   // store the user response and most recent video in an array at the key `twitchUsersData`
-  Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch_route__["a" /* default */])('/users?', usersList, usersData => {
-    Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch_route__["a" /* default */])('/streams?', Object(__WEBPACK_IMPORTED_MODULE_2__utils_parse__["a" /* parseKeysToArray */])(usersData.data, 'login'), streamsData => {
+  Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch__["a" /* default */])('/users?', usersList, usersData => {
+    Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch__["a" /* default */])('/streams?', Object(__WEBPACK_IMPORTED_MODULE_1__utils_parse__["a" /* parseKeysToArray */])(usersData.data, 'login'), streamsData => {
       if (streamsData.data.length) {
-        console.log('streamsData condition')
         // if streamsData, iterate over each obj in the response looking for user matches
         usersData.data.forEach(user => {
           // fetch video for each user because Twitch only lets me get one at a time
-          Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch_route__["a" /* default */])('/videos?first=1&', user.id, videosData => {
-            console.log(user.id, videosData)
+          Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch__["a" /* default */])('/videos?first=1&', user.id, videosData => {
             // TODO: validate that extant .last_stream is older than videosData.data[0]
             user.last_stream = videosData.data[0]
-            const oldUsersData = Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["a" /* getLocal */])('twitchUsersData')
+            const oldUsersData = Object(__WEBPACK_IMPORTED_MODULE_2__api_calls_storage_js__["a" /* getLocal */])('twitchUsersData')
             // if current user exists in storage replace it with new data
             if (oldUsersData) {
               if (oldUsersData.find(oldUser => oldUser.id === user.id)) {
                 oldUsersData.splice(oldUsersData.findIndex(oldUser => oldUser.id === user.id),
                   1, user)
               } else oldUsersData.push(user)
-              Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', oldUsersData)
-            } else Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', [user])
+              Object(__WEBPACK_IMPORTED_MODULE_2__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', oldUsersData)
+            } else Object(__WEBPACK_IMPORTED_MODULE_2__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', [user])
             streamsData.data.forEach(stream => {
               if (stream.user_id === user.id) {
               // if it's a match, add the stream data and append element to DOM
@@ -320,19 +304,18 @@ if (storedUsers) {
         // if no streams data, store and display usersData unmodified
         usersData.data.forEach(user => {
           // fetch video for each user because Twitch only lets me get one at a time
-          Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch_route__["a" /* default */])('/videos?first=1&', user.id, videosData => {
-            console.log(user.id, videosData)
+          Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch__["a" /* default */])('/videos?first=1&', user.id, videosData => {
             // TODO: validate that stored .last_stream is older than videosData.data[0]
             user.last_stream = videosData.data[0]
-            const oldUsersData = Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["a" /* getLocal */])('twitchUsersData')
+            const oldUsersData = Object(__WEBPACK_IMPORTED_MODULE_2__api_calls_storage_js__["a" /* getLocal */])('twitchUsersData')
             // if current user exists in storage replace it with new data
             if (oldUsersData) {
               if (oldUsersData.find(oldUser => oldUser.id === user.id)) {
                 oldUsersData.splice(oldUsersData.findIndex(oldUser => oldUser.id === user.id),
                   1, user)
               } else oldUsersData.push(user)
-              Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', oldUsersData)
-            } else Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', [user])
+              Object(__WEBPACK_IMPORTED_MODULE_2__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', oldUsersData)
+            } else Object(__WEBPACK_IMPORTED_MODULE_2__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', [user])
             createStreamerContainer(user, (element, user) => {
               populateUserData(element, user, function(element) {
                 feed.appendChild(element)
@@ -347,11 +330,83 @@ if (storedUsers) {
 
 
 /***/ }),
-/* 2 */
+/* 2 */,
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return lookupParamName; });
+// is it a user login or is it a user id?
+function lookupUserParam(param) {
+  return +param ? 'id' : 'login'
+}
+
+// lookup and return a single paramName
+function lookupParamName(route, param) {
+  const paramTable = {
+    '/users': lookupUserParam(param),
+    '/streams': 'user_' + lookupUserParam(param),
+    '/videos': 'user_id',
+    '/search': 'query'
+  }
+  return paramTable[route]
+}
+
+
+
+
+/***/ }),
+/* 4 */,
+/* 5 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return setLocal; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return getLocal; });
+function setLocal(key, val) {
+  // check if storage accessible
+  if (!('localStorage' in window)) {
+    window.alert('This site wants to use html5 localStorage but your browser does not support it. Some features may not be available. Consider upgrading your browser to the most recent version.')
+    return false
+  }
+  // stringify values to make them storage-ready
+  val = JSON.stringify(val)
+  try {
+    window.localStorage.setItem(key, val)
+  } catch (e) {
+    if (e === 'QUOTA_EXCEEDED_ERR' || e.code === 22) {
+      // should I make this a choice?
+      window.alert('Local storage quota exceeded. Please clear storage and reload page to try again.')
+    }
+    // also check for security error?
+    // but what does that security error look like if I'm to check for it?
+  }
+  return { [key]: val }
+}
+
+function getLocal(key) {
+  if (!('localStorage' in window)) {
+    window.alert('This site wants to access html5 localStorage but your browser does not support it. Some features may not be available. Consider upgrading your browser to the most recent version.')
+    return false
+  }
+  var item = window.localStorage.getItem(key)
+  if (!item) {
+    return false
+  } else {
+    return JSON.parse(item)
+  }
+}
+
+
+
+
+/***/ }),
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = fetchTwitchRoute;
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return searchTwitch; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_parse__ = __webpack_require__(0);
 // users endpoint: GET https://api.twitch.tv/helix/users
 // users query params: ?id=<String>&login=<String>
@@ -395,134 +450,17 @@ function fetchTwitchRoute(route, params, fn) {
     })
 }
 
-// function getUsers(users, key, fn) {
-//   const target = endpoint + '/users?' + parseUsers(users, 'login')
-//   console.log('users target', target)
-//   options.headers['Client-ID'] = key
-//   window.fetch(target, options)
-//     .then(res => {
-//       console.log('res.headers:', res.headers)
-//       return res.json()
-//     })
-//     .then(json => {
-//       fn(json)
-//     })
-//     .catch(err => {
-//       // TODO: better error handling than this
-//       wtf(err)
-//     })
-// }
-//
-// function getStreams(users, key, fn) {
-//   const target = endpoint + '/streams?' + parseUsers(users, 'user_login')
-//   console.log('streams target', target)
-//   options.headers['Client-ID'] = key
-//   window.fetch(target, options)
-//     .then(res => {
-//       return res.json()
-//     })
-//     .then(json => {
-//       fn(json)
-//     })
-//     .catch(err => {
-//       // TODO: better error handling than this
-//       wtf(err)
-//     })
-// }
-
-// export { getStreams, getUsers }
-
-
-/***/ }),
-/* 3 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return lookupParamName; });
-// is it a user login or is it a user id?
-function lookupUserParam(param) {
-  return +param ? 'id' : 'login'
-}
-
-// lookup and return a single paramName
-function lookupParamName(route, param) {
-  const paramTable = {
-    '/users': lookupUserParam(param),
-    '/streams': 'user_' + lookupUserParam(param),
-    '/videos': 'user_id',
-    '/search': 'query'
-  }
-  return paramTable[route]
-}
-
-
-
-
-/***/ }),
-/* 4 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = liveSearch;
-// constants
-const endpoint = 'https://api.twitch.tv/kraken/search/channels?query='
-const options = {
-  Method: 'GET',
-  headers: { 'Client-ID': '' }
-}
-
-function liveSearch(apiKey, term, fn) {
-  console.log(apiKey)
-  options['Client-ID'] = apiKey
-  window.fetch(`${endpoint}${term}`, options)
+function searchTwitch(term, fn) {
+  const target = endpoint + '/search/channels?' + Object(__WEBPACK_IMPORTED_MODULE_0__utils_parse__["b" /* parseParamsToString */])('/search', term)
+  const req = new window.Request(target)
+  console.log('search target:', target)
+  window.fetch(req)
     .then(res => {
       return res.json()
     })
     .then(json => {
       fn(json)
     })
-}
-
-
-/***/ }),
-/* 5 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return setLocal; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return getLocal; });
-function setLocal(key, val) {
-  // check if storage accessible
-  if (!('localStorage' in window)) {
-    window.alert('This site wants to use html5 localStorage but your browser does not support it. Some features may not be available. Consider upgrading your browser to the most recent version.')
-    return false
-  }
-  // stringify values to make them storage-ready
-  val = JSON.stringify(val)
-  try {
-    window.localStorage.setItem(key, val)
-  } catch (e) {
-    if (e === 'QUOTA_EXCEEDED_ERR' || e.code === 22) {
-      // should I make this a choice?
-      window.alert('Local storage quota exceeded. Please clear storage and reload page to try again.')
-    }
-    // also check for security error?
-    // but what does that security error look like if I'm to check for it?
-  }
-  return { [key]: val }
-}
-
-function getLocal(key) {
-  if (!('localStorage' in window)) {
-    window.alert('This site wants to access html5 localStorage but your browser does not support it. Some features may not be available. Consider upgrading your browser to the most recent version.')
-    return false
-  }
-  var item = window.localStorage.getItem(key)
-  if (!item) {
-    return false
-  } else {
-    return JSON.parse(item)
-  }
 }
 
 

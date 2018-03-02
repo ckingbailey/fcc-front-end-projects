@@ -78,7 +78,7 @@
     .submit-search {
       border-width: 1px;
       background-color: var(--grey);
-      background-image: linear-gradient(to top, var(--lt-grey), #fff1);
+      background-image: linear-gradient(to bottom, var(--lt-grey), #fff1);
     }
     .submit-search:hover {
       background-color: var(--blue);
@@ -87,7 +87,7 @@
     .submit-search:focus {
       box-shadow: inset 0 0 1px 0 black;
       background-color: #666;
-      background-image: linear-gradient(to top, var(--trans-grey), #fff1);
+      background-image: none;
     }
     .feed {
       background-color: black;
@@ -162,9 +162,9 @@
   </head>
   <body>
     <div id="mainContainer" class="main container">
-      <form id="searchForm" class="search-form">
-        <input id="searchField" class="search-field" type="text" placeholder="SEARCH" />
-        <button id="submitSearch" class="submit-search" type="submit">Submit</button>
+      <form name="searchForm" id="searchForm" class="search-form">
+        <input name="searchField" id="searchField" class="search-field" type="text" placeholder="SEARCH" />
+        <button name="submitSearch" id="submitSearch" class="submit-search" type="submit">Submit</button>
       </form>
       <div id="feed" class="feed"></div>
     </div>
