@@ -148,7 +148,7 @@ function handleSearchInput(ev) {
 
 function createStreamerContainer(data, fn) {
   // streamer container components
-  const [ streamerContainer, imgContainer, textContainer, streamContainer ] =
+  const [ streamer, imgContainer, textContainer, streamContainer ] =
     [ document.createElement('div'), document.createElement('div'),
       document.createElement('div'), document.createElement('div') ]
   const streamerAvatar = document.createElement('img')
@@ -157,34 +157,24 @@ function createStreamerContainer(data, fn) {
   const [ userDescrip, curStream, lastStream ] =
     [ document.createElement('p'), document.createElement('p'),
       document.createElement('p')]
-  streamerContainer.classList.add('streamer-container', 'flex-container')
-  imgContainer.classList.add('flex-child', 'avatar-container')
-  textContainer.classList.add('flex-child', 'text-container')
-  streamContainer.classList.add('stream-container')
-  streamerContainer.appendChild(imgContainer)
-  streamerContainer.appendChild(textContainer)
-  streamerAvatar.classList.add('streamer-avatar')
-  imgContainer.appendChild(streamerAvatar)
-  userLink.classList.add('streamer-link')
-  userHeading.classList.add('streamer-name')
-  userLink.appendChild(userHeading)
-  textContainer.appendChild(userLink)
-  userDescrip.classList.add('description')
-  textContainer.appendChild(userDescrip)
-  curStream.classList.add('current-stream')
-  streamContainer.appendChild(curStream)
-  lastStream.classList.add('prev-stream')
-  streamContainer.appendChild(lastStream)
-  textContainer.appendChild(streamContainer)
-  fn(streamerContainer, data)
-  // TODO: what data do I want to display?
-  // user name, whether they are streaming, what they are streaming, for how long, how many viewers
+  streamer.classList.add('streamer-container', 'flex-container')
+  streamer.appendChild(imgContainer).classList.add('flex-child', 'avatar-container')
+  streamer.appendChild(textContainer).classList.add('flex-child', 'text-container')
+  imgContainer.appendChild(streamerAvatar).classList.add('streamer-avatar')
+  textContainer.appendChild(userHeading).classList.add('streamer-name')
+  textContainer.appendChild(userDescrip).classList.add('description')
+  textContainer.appendChild(streamContainer).classList.add('stream-container')
+  userHeading.appendChild(userLink).classList.add('streamer-link')
+  userLink.setAttribute('target', '_blank')
+  streamContainer.appendChild(curStream).classList.add('current-stream')
+  streamContainer.appendChild(lastStream).classList.add('prev-stream')
+  fn(streamer, data)
 }
 
 function populateUserData(element, data, fn) {
   element.querySelector('.streamer-avatar').src = data.profile_image_url
   element.querySelector('.streamer-link').href = `https://www.twitch.tv/${data.login}`
-  element.querySelector('.streamer-name').innerText = data.display_name
+  element.querySelector('.streamer-link').innerText = data.display_name
   element.querySelector('.description').innerText = data.description
   fn(element, data)
 }
