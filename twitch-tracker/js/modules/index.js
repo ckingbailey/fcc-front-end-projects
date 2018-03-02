@@ -16,6 +16,9 @@ const searchForm = document.getElementById('searchForm')
 searchForm.addEventListener('submit', handleSearchSubmit)
 const searchField = document.getElementById('searchField')
 searchField.addEventListener('input', handleSearchInput)
+const noStream = {
+  title: 'OFFLINE'
+}
 
 function handleSearchSubmit(ev) {
   ev.preventDefault()
@@ -75,8 +78,8 @@ function populateUserData(element, data, fn) {
 }
 
 function populateStreamData(element, data, fn) {
-  const ellipsis = data.title.length > 50 ? '...' : ''
-  const streamBlurb = data.title.slice(0, 50)
+  const ellipsis = data.cur_stream.title.length > 50 ? '...' : ''
+  const streamBlurb = data.cur_stream.title.slice(0, 50)
   element.querySelector('.current-stream').innerText = 'CURRENTLY STREAMING: ' +
     streamBlurb + ellipsis
   fn(element, data)
@@ -88,30 +91,34 @@ function populateStreamData(element, data, fn) {
 const storedUsers = getLocal('twitchUsersData')
 if (storedUsers) {
   console.log('storedUsers condition')
-  const usersLogins = parseKeysToArray(storedUsers, 'login')
-  fetchTwitchRoute('/streams?', usersLogins, streamsData => {
-    // always set top level object to its own data property
-    streamsData = streamsData.data
-    // if streamsData, add it to streamerContainers
-    if (streamsData.length) {
-      // append streamsData to each corresponding usersData element
-      streamsData.forEach(stream => {
-        storedUsers.forEach(user => {
-          fetchTwitchRoute('/videos?first=1&', user.id, videosData => {
-            console.log(videosData)
-            if (user.id === stream.user_id) {
-              const streamUser = Object.assign({}, user, stream)
-              createStreamerContainer(streamUser, (element, streamUser) => {
-                populateUserData(element, streamUser, (element, streamUser) => {
-                  populateStreamData(element, streamUser, (element, steamUser) => {
+  fetchTwitchRoute('/streams?', parseKeysToArray(storedUsers, 'login'), streamsData => {
+    if (streamsData.data.length) {
+      console.log('streamsData condition')
+      // if streamsData, iterate over each obj in the response looking for user matches
+      storedUsers.forEach(user => {
+        // fetch video for each user because Twitch only lets me get one at a time
+        fetchTwitchRoute('/videos?first=1&', user.id, videosData => {
+          console.log(user.id, videosData)
+          user.last_stream = videosData.data.length ? videosData.data[0] : 'no videos found'
+          // for each stored user, iterate over streamsData checking for id match
+          streamsData.data.forEach(stream => {
+            // if it's a match, add the stream data and append element to DOM
+            if (stream.user_id === user.id) {
+              user.cur_stream = stream
+              createStreamerContainer(user, (element, user) => {
+                populateUserData(element, user, (element, user) => {
+                  populateStreamData(element, user, (element) => {
                     feed.appendChild(element)
                   })
                 })
               })
             } else {
+              user.cur_stream = noStream
               createStreamerContainer(user, (element, user) => {
-                populateUserData(element, user, function(element) {
-                  feed.appendChild(element)
+                populateUserData(element, user, (element, user) => {
+                  populateStreamData(element, user, (element) => {
+                    feed.appendChild(element)
+                  })
                 })
               })
             }
@@ -119,11 +126,12 @@ if (storedUsers) {
         })
       })
     } else {
+      console.log('!streamsData condition')
       storedUsers.forEach(user => {
         fetchTwitchRoute('/videos?first=1&', user.id, videosData => {
-          console.log(videosData)
+          console.log(user.id, videosData)
           createStreamerContainer(user, (element, user) => {
-            populateUserData(element, user, function(element) {
+            populateUserData(element, user, (element) => {
               feed.appendChild(element)
             })
           })
@@ -133,53 +141,74 @@ if (storedUsers) {
   })
 } else {
   console.log('!storedUsers condition')
-  // if no stored users
-  // grab key from my server then query for users
+  // if no stored users qry server to qry Twitch for users
   // then query for streams
-  // store the user response and date of stream in an array at the key `twitchUsersData`
+  // store the user response and most recent video in an array at the key `twitchUsersData`
   fetchTwitchRoute('/users?', usersList, usersData => {
-    usersData = usersData.data
-    // call getStreams after getUsers
-    // populateStreamerContainer with streamsData and usersData
-    // if no streamData, populateStreamerContainer with usersData only
-    fetchTwitchRoute('/streams?', usersList, streamsData => {
-      streamsData = streamsData.data
-      // if streamsData, add it to streamerContainers
-      if (streamsData.length) {
-        // append streamsData to each corresponding usersData element
-        setLocal('twitchUsersData',
-          usersData.map(user => {
-            const curStream = streamsData.filter(stream => {
-              return user.id === stream.user_id
-            })[0]
-            if (streamsData.filter(stream => user.id === stream.user_id)[0]) {
-              user.stream = { last_stream: curStream.started_at,
-                last_stream_id: curStream.id }
-              const streamingUser = Object.assign(user, { stream: curStream })
-              createStreamerContainer(streamingUser, (element, streamingUser) => {
-                populateUserData(element, streamingUser, (element, streamingUser) => {
-                  populateStreamData(element, streamingUser, (element, streamingUser) => {
-                    feed.appendChild(element)
+    fetchTwitchRoute('/streams?', parseKeysToArray(usersData.data, 'login'), streamsData => {
+      if (streamsData.data.length) {
+        console.log('streamsData condition')
+        // if streamsData, iterate over each obj in the response looking for user matches
+        usersData.data.forEach(user => {
+          // fetch video for each user because Twitch only lets me get one at a time
+          fetchTwitchRoute('/videos?first=1&', user.id, videosData => {
+            console.log(user.id, videosData)
+            // TODO: validate that extant .last_stream is older than videosData.data[0]
+            user.last_stream = videosData.data.length ? videosData.data[0] : 'no videos found'
+            const oldUsersData = getLocal('twitchUsersData')
+            // if current user exists in storage replace it with new data
+            if (oldUsersData) {
+              if (oldUsersData.find(oldUser => oldUser.id === user.id)) {
+                oldUsersData.splice(oldUsersData.findIndex(oldUser => oldUser.id === user.id),
+                  1, user)
+              } else oldUsersData.push(user)
+              setLocal('twitchUsersData', oldUsersData)
+            } else setLocal('twitchUsersData', [user])
+            streamsData.data.forEach(stream => {
+              if (stream.user_id === user.id) {
+              // if it's a match, add the stream data and append element to DOM
+                user.cur_stream = stream
+                createStreamerContainer(user, (element, user) => {
+                  populateUserData(element, user, (element, user) => {
+                    populateStreamData(element, user, (element) => {
+                      feed.appendChild(element)
+                    })
                   })
                 })
-              })
-            } else {
-              createStreamerContainer(user, (element, user) => {
-                populateUserData(element, user, function(element) {
-                  feed.appendChild(element)
+              } else {
+                user.cur_stream = noStream
+                createStreamerContainer(user, (element, user) => {
+                  populateUserData(element, user, (element, user) => {
+                    populateStreamData(element, user, (element) => {
+                      feed.appendChild(element)
+                    })
+                  })
                 })
-              })
-            }
-            return user
+              }
+            })
           })
-        )
+        })
       } else {
         // if no streams data, store and display usersData unmodified
-        setLocal('twitchUsersData', usersData)
-        usersData.forEach(user => {
-          createStreamerContainer(user, (element, user) => {
-            populateUserData(element, user, function(element) {
-              feed.appendChild(element)
+        usersData.data.forEach(user => {
+          // fetch video for each user because Twitch only lets me get one at a time
+          fetchTwitchRoute('/videos?first=1&', user.id, videosData => {
+            console.log(user.id, videosData)
+            // TODO: validate that stored .last_stream is older than videosData.data[0]
+            user.last_stream = videosData.data.length ? videosData.data[0] : 'no videos found'
+            const oldUsersData = getLocal('twitchUsersData')
+            // if current user exists in storage replace it with new data
+            if (oldUsersData) {
+              if (oldUsersData.find(oldUser => oldUser.id === user.id)) {
+                oldUsersData.splice(oldUsersData.findIndex(oldUser => oldUser.id === user.id),
+                  1, user)
+              } else oldUsersData.push(user)
+              setLocal('twitchUsersData', oldUsersData)
+            } else setLocal('twitchUsersData', [user])
+            createStreamerContainer(user, (element, user) => {
+              populateUserData(element, user, function(element) {
+                feed.appendChild(element)
+              })
             })
           })
         })
