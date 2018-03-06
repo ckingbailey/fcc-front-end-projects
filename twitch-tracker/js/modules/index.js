@@ -18,11 +18,13 @@ const submitBtn = document.getElementById('submitSearch')
 function handleSearchSubmit(ev) {
   ev.preventDefault()
   const term = ev.target.children['searchField'].value
+  // console.log('1', document.activeElement)
   if (term) {
     console.log(term)
     searchTwitch(term, response => console.log(response))
-    submitBtn.blur()
   }
+  submitBtn.blur()
+  // console.log('2', document.activeElement)
 }
 
 function createStreamerContainer(data, fn) {

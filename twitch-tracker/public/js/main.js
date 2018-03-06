@@ -129,11 +129,13 @@ const submitBtn = document.getElementById('submitSearch')
 function handleSearchSubmit(ev) {
   ev.preventDefault()
   const term = ev.target.children['searchField'].value
+  // console.log('1', document.activeElement)
   if (term) {
     console.log(term)
     Object(__WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch__["b" /* searchTwitch */])(term, response => console.log(response))
-    submitBtn.blur()
   }
+  submitBtn.blur()
+  // console.log('2', document.activeElement)
 }
 
 function createStreamerContainer(data, fn) {
