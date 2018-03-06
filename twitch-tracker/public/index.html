@@ -103,7 +103,14 @@
       align-items: flex-start;
     }
     .flex-child {
-      flex: 0 1 auto;
+      flex-shrink: 1;
+      flex-basis: auto;
+    }
+    .flex-child.avatar-container {
+      flex-grow: 0;
+    }
+    .flex-child.text-container {
+      flex-grow: 1;
     }
     .flex-child:not(:last-child) {
       margin-right: var(--pad);

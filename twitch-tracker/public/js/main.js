@@ -106,9 +106,9 @@ function parseParamsToString(route, params) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__api_calls_fetch_twitch__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils_parse__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__api_calls_storage_js__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__api_calls_storage_js__ = __webpack_require__(4);
 
 
  // NOTE: getLocal|setLocal stringifies|parse value for you
@@ -330,78 +330,7 @@ if (storedUsers) {
 
 
 /***/ }),
-/* 2 */,
-/* 3 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return lookupParamName; });
-// is it a user login or is it a user id?
-function lookupUserParam(param) {
-  return +param ? 'id' : 'login'
-}
-
-// lookup and return a single paramName
-function lookupParamName(route, param) {
-  const paramTable = {
-    '/users': lookupUserParam(param),
-    '/streams': 'user_' + lookupUserParam(param),
-    '/videos': 'user_id',
-    '/search': 'query'
-  }
-  return paramTable[route]
-}
-
-
-
-
-/***/ }),
-/* 4 */,
-/* 5 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return setLocal; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return getLocal; });
-function setLocal(key, val) {
-  // check if storage accessible
-  if (!('localStorage' in window)) {
-    window.alert('This site wants to use html5 localStorage but your browser does not support it. Some features may not be available. Consider upgrading your browser to the most recent version.')
-    return false
-  }
-  // stringify values to make them storage-ready
-  val = JSON.stringify(val)
-  try {
-    window.localStorage.setItem(key, val)
-  } catch (e) {
-    if (e === 'QUOTA_EXCEEDED_ERR' || e.code === 22) {
-      // should I make this a choice?
-      window.alert('Local storage quota exceeded. Please clear storage and reload page to try again.')
-    }
-    // also check for security error?
-    // but what does that security error look like if I'm to check for it?
-  }
-  return { [key]: val }
-}
-
-function getLocal(key) {
-  if (!('localStorage' in window)) {
-    window.alert('This site wants to access html5 localStorage but your browser does not support it. Some features may not be available. Consider upgrading your browser to the most recent version.')
-    return false
-  }
-  var item = window.localStorage.getItem(key)
-  if (!item) {
-    return false
-  } else {
-    return JSON.parse(item)
-  }
-}
-
-
-
-
-/***/ }),
-/* 6 */
+/* 2 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -461,6 +390,75 @@ function searchTwitch(term, fn) {
     .then(json => {
       fn(json)
     })
+}
+
+
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return lookupParamName; });
+// is it a user login or is it a user id?
+function lookupUserParam(param) {
+  return +param ? 'id' : 'login'
+}
+
+// lookup and return a single paramName
+function lookupParamName(route, param) {
+  const paramTable = {
+    '/users': lookupUserParam(param),
+    '/streams': 'user_' + lookupUserParam(param),
+    '/videos': 'user_id',
+    '/search': 'query'
+  }
+  return paramTable[route]
+}
+
+
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return setLocal; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return getLocal; });
+function setLocal(key, val) {
+  // check if storage accessible
+  if (!('localStorage' in window)) {
+    window.alert('This site wants to use html5 localStorage but your browser does not support it. Some features may not be available. Consider upgrading your browser to the most recent version.')
+    return false
+  }
+  // stringify values to make them storage-ready
+  val = JSON.stringify(val)
+  try {
+    window.localStorage.setItem(key, val)
+  } catch (e) {
+    if (e === 'QUOTA_EXCEEDED_ERR' || e.code === 22) {
+      // should I make this a choice?
+      window.alert('Local storage quota exceeded. Please clear storage and reload page to try again.')
+    }
+    // also check for security error?
+    // but what does that security error look like if I'm to check for it?
+  }
+  return { [key]: val }
+}
+
+function getLocal(key) {
+  if (!('localStorage' in window)) {
+    window.alert('This site wants to access html5 localStorage but your browser does not support it. Some features may not be available. Consider upgrading your browser to the most recent version.')
+    return false
+  }
+  var item = window.localStorage.getItem(key)
+  if (!item) {
+    return false
+  } else {
+    return JSON.parse(item)
+  }
 }
 
 
