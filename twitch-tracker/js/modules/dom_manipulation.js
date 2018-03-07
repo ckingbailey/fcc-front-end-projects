@@ -84,7 +84,9 @@ function writeNewSearchResultCard(data, fn) {
   addBtn.classList.add('add-btn')
   addBtn.dataset.addStreamer = data._id
   name.innerText = data.name
+  name.classList.add('result-name')
   avatar.src = data.logo
+  avatar.classList.add('result-avatar')
   card.appendChild(addBtn)
   card.appendChild(name)
   card.appendChild(avatar)

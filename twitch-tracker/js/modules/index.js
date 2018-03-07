@@ -31,7 +31,7 @@ function handleSearchSubmit(ev) {
       displaySearchResults(response, searchResultCard => {
         searchResultsDisplay.appendChild(searchResultCard)
       })
-      searchField.insertAdjacentElement('afterend', searchResultsDisplay)
+      searchForm.insertAdjacentElement('beforebegin', searchResultsDisplay)
       searchResultsDisplay.insertAdjacentElement('beforebegin', overlay)
     })
   }

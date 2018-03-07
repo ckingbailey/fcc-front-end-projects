@@ -143,7 +143,7 @@ function handleSearchSubmit(ev) {
       Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["a" /* displaySearchResults */])(response, searchResultCard => {
         searchResultsDisplay.appendChild(searchResultCard)
       })
-      searchField.insertAdjacentElement('afterend', searchResultsDisplay)
+      searchForm.insertAdjacentElement('beforebegin', searchResultsDisplay)
       searchResultsDisplay.insertAdjacentElement('beforebegin', overlay)
     })
   }
@@ -337,7 +337,9 @@ function writeNewSearchResultCard(data, fn) {
   addBtn.classList.add('add-btn')
   addBtn.dataset.addStreamer = data._id
   name.innerText = data.name
+  name.classList.add('result-name')
   avatar.src = data.logo
+  avatar.classList.add('result-avatar')
   card.appendChild(addBtn)
   card.appendChild(name)
   card.appendChild(avatar)
