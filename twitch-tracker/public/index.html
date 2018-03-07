@@ -37,6 +37,7 @@
       font-size: 16px;
     }
     .overlay {
+      z-index: 1;
       position: absolute;
       top: 0;
       left: 0;
@@ -57,6 +58,11 @@
       padding: var(--pad-box-less);
       text-align: right;
     }
+    .search-container {
+      position: relative;
+      display: inline-block;
+      min-width: 33%;
+    }
     .search-field, .submit-search {
       -webkit-appearance: none;
       margin: 1rem 0;
@@ -74,7 +80,7 @@
     }
     .search-field {
       border-width: 2px;
-      min-width: 33%;
+      width: 100%;
     }
     .search-field:placeholder {
       color: grey;
@@ -84,6 +90,7 @@
       border: 2px solid var(--lt-blue);
     }
     .search-results {
+      z-index: 2;
       position: absolute;
       top: 3.5rem; /* this value is a placeholder */
       right: var(--pad-less);
@@ -97,6 +104,7 @@
       background-color: var(--grey);
       color: white;
     }
+    .result-item {}
     .result-name {
       display: inline;
     }
@@ -124,6 +132,10 @@
       box-shadow: inset 0 0 6px 1px var(--trans-white);
       min-height: 7rem;
       padding: var(--pad-box-less);
+    }
+    .fetch-streamers-error {
+      text-align: center;
+      color: var(--green);
     }
     .flex-container {
       display: flex;
@@ -205,7 +217,9 @@
   <body>
     <div id="mainContainer" class="main container">
       <form name="searchForm" id="searchForm" class="search-form">
-        <input name="searchField" id="searchField" class="search-field" type="text" placeholder="SEARCH" />
+        <div id="searchContainer" class="search-container">
+          <input name="searchField" id="searchField" class="search-field" type="text" placeholder="SEARCH" />
+        </div>
         <button name="submitSearch" id="submitSearch" class="submit-search" type="submit">Submit</button>
       </form>
       <div id="feed" class="feed"></div>

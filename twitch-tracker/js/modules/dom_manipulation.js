@@ -75,11 +75,20 @@ function writeNewStreamer(container, data) {
   })
 }
 
+// in case of error in fetch streamers
+function displayFetchStreamerError(container, errData) {
+  const errText = document.createElement('p')
+  errText.innerText = 'My b, B. Unable to retrieve streamers data'
+  errText.classList.add('fetch-streamers-error')
+  container.appendChild(errText)
+}
+
 function writeNewSearchResultCard(data, fn) {
   const card = document.createElement('div')
   const addBtn = document.createElement('button')
   const name = document.createElement('p')
   const avatar = document.createElement('img')
+  card.classList.add('result-item')
   addBtn.innerText = '+'
   addBtn.classList.add('add-btn')
   addBtn.dataset.addStreamer = data._id
@@ -93,15 +102,25 @@ function writeNewSearchResultCard(data, fn) {
   fn(card)
 }
 
-// iterates over search results to write DOM elements
-// takes as args the results data and an ultimate callback
-function displaySearchResults(results, fn) {
-  console.log(results)
-  results.channels.forEach(result => {
-    writeNewSearchResultCard(result, element => {
-      fn(element)
-    })
-  })
+function writeNewErrorCard(errData, fn) {
+  const card = document.createElement('div')
+  const errText = document.createElement('span')
+  card.classList.add('search-error')
+  errText.innerText = 'My bad, B. Unable to retrieve search results'
+  card.appendChild(errText)
+  fn(card)
 }
 
-export { writeNewStreamer, displaySearchResults }
+// iterates over search results to write DOM elements
+// takes as args the results data and an ultimate callback
+function displaySearchResults(err, results, fn) {
+  console.log(results)
+  if (err) writeNewErrorCard(err, element => fn(element))
+  else {
+    results.channels.forEach(result => {
+      writeNewSearchResultCard(result, element => fn(element))
+    })
+  }
+}
+
+export { writeNewStreamer, displayFetchStreamerError, displaySearchResults }

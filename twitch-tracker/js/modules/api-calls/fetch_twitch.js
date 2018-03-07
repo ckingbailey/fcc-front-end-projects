@@ -27,15 +27,20 @@ export default function fetchTwitchRoute(route, params, fn) {
   const req = new window.Request(target)
   window.fetch(req)
     .then(res => {
-      return res.json()
+      if (res.ok) return res.json()
+      else wtf(res.status, res.statusText)
     })
     .then(json => {
       if (route.includes('streams')) {
         console.log('streams response', target, json)
       }
-      return fn(json)
+      // callback should handle error first, json second
+      return fn(null, json)
     })
     .catch(err => { // TODO: better err handling. what should I catch?
+      if (err.name === 'TypeError' && err.message === 'Failed to fetch') {
+        fn(err)
+      }
       wtf(err)
     })
 }
@@ -49,7 +54,11 @@ function searchTwitch(term, fn) {
       return res.json()
     })
     .then(json => {
-      fn(json)
+      fn(null, json)
+    })
+    .catch(err => {
+      console.log(typeof err, err)
+      fn(err)
     })
 }
 

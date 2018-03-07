@@ -123,6 +123,7 @@ const usersList = ['idlethumbs', 'freecodecamp', 'updownleftdie', 'omatum_greg',
 console.log('isProd? ' + isProd, 'api endpoint: ' + endpoint)
 
 // DOM elements
+const main = document.getElementById('mainContainer')
 const feed = document.getElementById('feed')
 const searchForm = document.getElementById('searchForm')
 searchForm.addEventListener('submit', handleSearchSubmit)
@@ -139,12 +140,20 @@ function handleSearchSubmit(ev) {
   // console.log('1', document.activeElement)
   if (term) {
     console.log(term)
-    Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["b" /* searchTwitch */])(term, response => {
-      Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["a" /* displaySearchResults */])(response, searchResultCard => {
-        searchResultsDisplay.appendChild(searchResultCard)
-      })
-      searchForm.insertAdjacentElement('beforebegin', searchResultsDisplay)
-      searchResultsDisplay.insertAdjacentElement('beforebegin', overlay)
+    Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["b" /* searchTwitch */])(term, (err, response) => {
+      if (err) {
+        Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["b" /* displaySearchResults */])(err, null, errorCard => {
+          searchResultsDisplay.appendChild(errorCard)
+        })
+        searchField.insertAdjacentElement('afterend', searchResultsDisplay)
+        main.insertAdjacentElement('beforebegin', overlay)
+      } else {
+        Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["b" /* displaySearchResults */])(response, searchResultCard => {
+          searchResultsDisplay.appendChild(searchResultCard)
+        })
+        searchField.insertAdjacentElement('afterend', searchResultsDisplay)
+        main.insertAdjacentElement('beforebegin', overlay)
+      }
     })
   }
   submitBtn.blur()
@@ -156,90 +165,96 @@ function handleSearchSubmit(ev) {
 // if nothing in localStorage, qry server for data from Twitch
 const storedUsers = Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["a" /* getLocal */])('twitchUsersData')
 if (storedUsers) {
-  Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* default */])('/streams?', Object(__WEBPACK_IMPORTED_MODULE_2__utils_parse__["a" /* parseKeysToArray */])(storedUsers, 'login'), streamsData => {
-    if (streamsData.data.length) {
-      // if streamsData, iterate over each obj in the response looking for user matches
-      storedUsers.forEach(user => {
-        // fetch video for each user because Twitch only lets me get one at a time
-        Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* default */])('/videos?first=1&', user.id, videosData => {
-          user.last_stream = videosData.data[0]
-          // for each stored user, iterate over streamsData checking for id match
-          streamsData.data.forEach(stream => {
-            // if it's a match, add the stream data and append element to DOM
-            if (stream.user_id === user.id) {
-              user.cur_stream = stream
-              Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["b" /* writeNewStreamer */])(feed, user)
-            } else {
-              user.cur_stream = null
-              Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["b" /* writeNewStreamer */])(feed, user)
-            }
+  Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* default */])('/streams?', Object(__WEBPACK_IMPORTED_MODULE_2__utils_parse__["a" /* parseKeysToArray */])(storedUsers, 'login'), (err, streamsData) => {
+    if (err) Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["a" /* displayFetchStreamerError */])(feed, err)
+    else {
+      if (streamsData.data.length) {
+        // if streamsData, iterate over each obj in the response looking for user matches
+        storedUsers.forEach(user => {
+          // fetch video for each user because Twitch only lets me get one at a time
+          Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* default */])('/videos?first=1&', user.id, videosData => {
+            user.last_stream = videosData.data[0]
+            // for each stored user, iterate over streamsData checking for id match
+            streamsData.data.forEach(stream => {
+              // if it's a match, add the stream data and append element to DOM
+              if (stream.user_id === user.id) {
+                user.cur_stream = stream
+                Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* writeNewStreamer */])(feed, user)
+              } else {
+                user.cur_stream = null
+                Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* writeNewStreamer */])(feed, user)
+              }
+            })
           })
         })
-      })
-    } else {
-      storedUsers.forEach(user => {
-        Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* default */])('/videos?first=1&', user.id, videosData => {
-          user.last_stream = videosData.data[0]
-          Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["b" /* writeNewStreamer */])(feed, user)
+      } else {
+        storedUsers.forEach(user => {
+          Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* default */])('/videos?first=1&', user.id, videosData => {
+            user.last_stream = videosData.data[0]
+            Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* writeNewStreamer */])(feed, user)
+          })
         })
-      })
+      }
     }
   })
 } else {
   // if no stored users qry server to qry Twitch for users
   // then query for streams
   // store the user response and most recent video in an array at the key `twitchUsersData`
-  Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* default */])('/users?', usersList, usersData => {
-    Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* default */])('/streams?', Object(__WEBPACK_IMPORTED_MODULE_2__utils_parse__["a" /* parseKeysToArray */])(usersData.data, 'login'), streamsData => {
-      if (streamsData.data.length) {
-        // if streamsData, iterate over each obj in the response looking for user matches
-        usersData.data.forEach(user => {
-          // fetch video for each user because Twitch only lets me get one at a time
-          Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* default */])('/videos?first=1&', user.id, videosData => {
-            // TODO: validate that extant .last_stream is older than videosData.data[0]
-            user.last_stream = videosData.data[0]
-            const oldUsersData = Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["a" /* getLocal */])('twitchUsersData')
-            // if current user exists in storage replace it with new data
-            if (oldUsersData) {
-              if (oldUsersData.find(oldUser => oldUser.id === user.id)) {
-                oldUsersData.splice(oldUsersData.findIndex(oldUser => oldUser.id === user.id),
-                  1, user)
-              } else oldUsersData.push(user)
-              Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', oldUsersData)
-            } else Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', [user])
-            streamsData.data.forEach(stream => {
-              if (stream.user_id === user.id) {
-              // if it's a match, add the stream data and append element to DOM
-                user.cur_stream = stream
-                Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["b" /* writeNewStreamer */])(feed, user)
-              } else {
-                user.cur_stream = null
-                Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["b" /* writeNewStreamer */])(feed, user)
-              }
+  Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* default */])('/users?', usersList, (err, usersData) => {
+    if (err) Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["a" /* displayFetchStreamerError */])(feed, err)
+    else {
+      Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* default */])('/streams?', Object(__WEBPACK_IMPORTED_MODULE_2__utils_parse__["a" /* parseKeysToArray */])(usersData.data, 'login'), streamsData => {
+        if (streamsData.data.length) {
+          // if streamsData, iterate over each obj in the response looking for user matches
+          usersData.data.forEach(user => {
+            // fetch video for each user because Twitch only lets me get one at a time
+            Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* default */])('/videos?first=1&', user.id, videosData => {
+              // TODO: validate that extant .last_stream is older than videosData.data[0]
+              user.last_stream = videosData.data[0]
+              const oldUsersData = Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["a" /* getLocal */])('twitchUsersData')
+              // if current user exists in storage replace it with new data
+              if (oldUsersData) {
+                if (oldUsersData.find(oldUser => oldUser.id === user.id)) {
+                  oldUsersData.splice(oldUsersData.findIndex(oldUser => oldUser.id === user.id),
+                    1, user)
+                } else oldUsersData.push(user)
+                Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', oldUsersData)
+              } else Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', [user])
+              streamsData.data.forEach(stream => {
+                if (stream.user_id === user.id) {
+                // if it's a match, add the stream data and append element to DOM
+                  user.cur_stream = stream
+                  Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* writeNewStreamer */])(feed, user)
+                } else {
+                  user.cur_stream = null
+                  Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* writeNewStreamer */])(feed, user)
+                }
+              })
             })
           })
-        })
-      } else {
-        // if no streams data, store and display usersData unmodified
-        usersData.data.forEach(user => {
-          // fetch video for each user because Twitch only lets me get one at a time
-          Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* default */])('/videos?first=1&', user.id, videosData => {
-            // TODO: validate that stored .last_stream is older than videosData.data[0]
-            user.last_stream = videosData.data[0]
-            const oldUsersData = Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["a" /* getLocal */])('twitchUsersData')
-            // if current user exists in storage replace it with new data
-            if (oldUsersData) {
-              if (oldUsersData.find(oldUser => oldUser.id === user.id)) {
-                oldUsersData.splice(oldUsersData.findIndex(oldUser => oldUser.id === user.id),
-                  1, user)
-              } else oldUsersData.push(user)
-              Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', oldUsersData)
-            } else Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', [user])
-            Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["b" /* writeNewStreamer */])(feed, user)
+        } else {
+          // if no streams data, store and display usersData unmodified
+          usersData.data.forEach(user => {
+            // fetch video for each user because Twitch only lets me get one at a time
+            Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* default */])('/videos?first=1&', user.id, videosData => {
+              // TODO: validate that stored .last_stream is older than videosData.data[0]
+              user.last_stream = videosData.data[0]
+              const oldUsersData = Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["a" /* getLocal */])('twitchUsersData')
+              // if current user exists in storage replace it with new data
+              if (oldUsersData) {
+                if (oldUsersData.find(oldUser => oldUser.id === user.id)) {
+                  oldUsersData.splice(oldUsersData.findIndex(oldUser => oldUser.id === user.id),
+                    1, user)
+                } else oldUsersData.push(user)
+                Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', oldUsersData)
+              } else Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', [user])
+              Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* writeNewStreamer */])(feed, user)
+            })
           })
-        })
-      }
-    })
+        }
+      })
+    }
   })
 }
 
@@ -249,8 +264,9 @@ if (storedUsers) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return writeNewStreamer; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return displaySearchResults; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return writeNewStreamer; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return displayFetchStreamerError; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return displaySearchResults; });
 function createStreamerContainer(data, fn) {
   // streamer container components
   const [ streamer, imgContainer, textContainer, streamContainer ] =
@@ -328,11 +344,20 @@ function writeNewStreamer(container, data) {
   })
 }
 
+// in case of error in fetch streamers
+function displayFetchStreamerError(container, errData) {
+  const errText = document.createElement('p')
+  errText.innerText = 'My b, B. Unable to retrieve streamers data'
+  errText.classList.add('fetch-streamers-error')
+  container.appendChild(errText)
+}
+
 function writeNewSearchResultCard(data, fn) {
   const card = document.createElement('div')
   const addBtn = document.createElement('button')
   const name = document.createElement('p')
   const avatar = document.createElement('img')
+  card.classList.add('result-item')
   addBtn.innerText = '+'
   addBtn.classList.add('add-btn')
   addBtn.dataset.addStreamer = data._id
@@ -346,15 +371,25 @@ function writeNewSearchResultCard(data, fn) {
   fn(card)
 }
 
+function writeNewErrorCard(errData, fn) {
+  const card = document.createElement('div')
+  const errText = document.createElement('span')
+  card.classList.add('search-error')
+  errText.innerText = 'My bad, B. Unable to retrieve search results'
+  card.appendChild(errText)
+  fn(card)
+}
+
 // iterates over search results to write DOM elements
 // takes as args the results data and an ultimate callback
-function displaySearchResults(results, fn) {
+function displaySearchResults(err, results, fn) {
   console.log(results)
-  results.channels.forEach(result => {
-    writeNewSearchResultCard(result, element => {
-      fn(element)
+  if (err) writeNewErrorCard(err, element => fn(element))
+  else {
+    results.channels.forEach(result => {
+      writeNewSearchResultCard(result, element => fn(element))
     })
-  })
+  }
 }
 
 
@@ -397,15 +432,20 @@ function fetchTwitchRoute(route, params, fn) {
   const req = new window.Request(target)
   window.fetch(req)
     .then(res => {
-      return res.json()
+      if (res.ok) return res.json()
+      else wtf(res.status, res.statusText)
     })
     .then(json => {
       if (route.includes('streams')) {
         console.log('streams response', target, json)
       }
-      return fn(json)
+      // callback should handle error first, json second
+      return fn(null, json)
     })
     .catch(err => { // TODO: better err handling. what should I catch?
+      if (err.name === 'TypeError' && err.message === 'Failed to fetch') {
+        fn(err)
+      }
       wtf(err)
     })
 }
@@ -419,7 +459,11 @@ function searchTwitch(term, fn) {
       return res.json()
     })
     .then(json => {
-      fn(json)
+      fn(null, json)
+    })
+    .catch(err => {
+      console.log(typeof err, err)
+      fn(err)
     })
 }
 
