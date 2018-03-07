@@ -92,25 +92,38 @@
     .search-results {
       z-index: 2;
       position: absolute;
-      top: 3.5rem; /* this value is a placeholder */
-      right: var(--pad-less);
+      top: 3.125rem; /* this value is a work in progress */
+      left: 2px;
       border: 1px solid var(--dark-blue);
+      width: calc(100% - 4px);
+      padding: var(--pad-box);
       background-color: white;
+      text-align: left;
+    }
+    .result-item {
+      margin-bottom: .25rem;
+    }
+    .result-item>*:not(:last-child) {
+      margin-right: .25rem;
     }
     .add-btn {
       -webkit-appearance: none;
       border: none;
       border-radius: 50%;
+      width: 1.125rem;
+      height: 1.125rem;
+      padding: 0;
       background-color: var(--grey);
       color: white;
     }
-    .result-item {}
     .result-name {
       display: inline;
     }
     .result-avatar {
-      width: 1rem;
-      height: 1rem;
+      width: 1.25rem;
+      height: 1.25rem;
+      line-height: 1;
+      vertical-align: text-top;
     }
     .submit-search {
       border-width: 1px;

@@ -142,13 +142,15 @@ function handleSearchSubmit(ev) {
     console.log(term)
     Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["b" /* searchTwitch */])(term, (err, response) => {
       if (err) {
+        console.log('err was passed to searchTwitch callback')
         Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["b" /* displaySearchResults */])(err, null, errorCard => {
           searchResultsDisplay.appendChild(errorCard)
         })
         searchField.insertAdjacentElement('afterend', searchResultsDisplay)
         main.insertAdjacentElement('beforebegin', overlay)
       } else {
-        Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["b" /* displaySearchResults */])(response, searchResultCard => {
+        console.log('response was passed to searchTwitch callback')
+        Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["b" /* displaySearchResults */])(null, response, searchResultCard => {
           searchResultsDisplay.appendChild(searchResultCard)
         })
         searchField.insertAdjacentElement('afterend', searchResultsDisplay)
@@ -157,6 +159,7 @@ function handleSearchSubmit(ev) {
     })
   }
   submitBtn.blur()
+  searchField.blur()
   // console.log('2', document.activeElement)
 }
 

@@ -30,13 +30,15 @@ function handleSearchSubmit(ev) {
     console.log(term)
     searchTwitch(term, (err, response) => {
       if (err) {
+        console.log('err was passed to searchTwitch callback')
         displaySearchResults(err, null, errorCard => {
           searchResultsDisplay.appendChild(errorCard)
         })
         searchField.insertAdjacentElement('afterend', searchResultsDisplay)
         main.insertAdjacentElement('beforebegin', overlay)
       } else {
-        displaySearchResults(response, searchResultCard => {
+        console.log('response was passed to searchTwitch callback')
+        displaySearchResults(null, response, searchResultCard => {
           searchResultsDisplay.appendChild(searchResultCard)
         })
         searchField.insertAdjacentElement('afterend', searchResultsDisplay)
@@ -45,6 +47,7 @@ function handleSearchSubmit(ev) {
     })
   }
   submitBtn.blur()
+  searchField.blur()
   // console.log('2', document.activeElement)
 }
 
