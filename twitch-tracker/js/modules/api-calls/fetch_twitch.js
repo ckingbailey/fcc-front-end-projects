@@ -28,7 +28,11 @@ export default function fetchTwitchRoute(route, params, fn) {
   window.fetch(req)
     .then(res => {
       if (res.ok) return res.json()
-      else wtf(res.status, res.statusText)
+      else {
+        // if !res.ok callback will handle res as an error
+        fn(res)
+        wtf(res.status, res.statusText)
+      }
     })
     .then(json => {
       if (route.includes('streams')) {

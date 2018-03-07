@@ -136,7 +136,7 @@ overlay.classList.add('overlay')
 
 function handleSearchSubmit(ev) {
   ev.preventDefault()
-  const term = ev.target.children['searchField'].value
+  const term = ev.target.children['searchContainer'].children['searchField'].value
   // console.log('1', document.activeElement)
   if (term) {
     console.log(term)
@@ -172,26 +172,32 @@ if (storedUsers) {
         // if streamsData, iterate over each obj in the response looking for user matches
         storedUsers.forEach(user => {
           // fetch video for each user because Twitch only lets me get one at a time
-          Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* default */])('/videos?first=1&', user.id, videosData => {
-            user.last_stream = videosData.data[0]
-            // for each stored user, iterate over streamsData checking for id match
-            streamsData.data.forEach(stream => {
-              // if it's a match, add the stream data and append element to DOM
-              if (stream.user_id === user.id) {
-                user.cur_stream = stream
-                Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* writeNewStreamer */])(feed, user)
-              } else {
-                user.cur_stream = null
-                Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* writeNewStreamer */])(feed, user)
-              }
-            })
+          Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* default */])('/videos?first=1&', user.id, (err, videosData) => {
+            if (err) console.error(err) // TODO: how to properly handle an error here?
+            else {
+              user.last_stream = videosData.data[0]
+              // for each stored user, iterate over streamsData checking for id match
+              streamsData.data.forEach(stream => {
+                // if it's a match, add the stream data and append element to DOM
+                if (stream.user_id === user.id) {
+                  user.cur_stream = stream
+                  Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* writeNewStreamer */])(feed, user)
+                } else {
+                  user.cur_stream = null
+                  Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* writeNewStreamer */])(feed, user)
+                }
+              })
+            }
           })
         })
       } else {
         storedUsers.forEach(user => {
-          Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* default */])('/videos?first=1&', user.id, videosData => {
-            user.last_stream = videosData.data[0]
-            Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* writeNewStreamer */])(feed, user)
+          Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* default */])('/videos?first=1&', user.id, (err, videosData) => {
+            if (err) console.error(err) // TODO: how to properly handle an error here?
+            else {
+              user.last_stream = videosData.data[0]
+              Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* writeNewStreamer */])(feed, user)
+            }
           })
         })
       }
@@ -204,54 +210,63 @@ if (storedUsers) {
   Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* default */])('/users?', usersList, (err, usersData) => {
     if (err) Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["a" /* displayFetchStreamerError */])(feed, err)
     else {
-      Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* default */])('/streams?', Object(__WEBPACK_IMPORTED_MODULE_2__utils_parse__["a" /* parseKeysToArray */])(usersData.data, 'login'), streamsData => {
-        if (streamsData.data.length) {
-          // if streamsData, iterate over each obj in the response looking for user matches
-          usersData.data.forEach(user => {
-            // fetch video for each user because Twitch only lets me get one at a time
-            Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* default */])('/videos?first=1&', user.id, videosData => {
-              // TODO: validate that extant .last_stream is older than videosData.data[0]
-              user.last_stream = videosData.data[0]
-              const oldUsersData = Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["a" /* getLocal */])('twitchUsersData')
-              // if current user exists in storage replace it with new data
-              if (oldUsersData) {
-                if (oldUsersData.find(oldUser => oldUser.id === user.id)) {
-                  oldUsersData.splice(oldUsersData.findIndex(oldUser => oldUser.id === user.id),
-                    1, user)
-                } else oldUsersData.push(user)
-                Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', oldUsersData)
-              } else Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', [user])
-              streamsData.data.forEach(stream => {
-                if (stream.user_id === user.id) {
-                // if it's a match, add the stream data and append element to DOM
-                  user.cur_stream = stream
-                  Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* writeNewStreamer */])(feed, user)
-                } else {
-                  user.cur_stream = null
+      Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* default */])('/streams?', Object(__WEBPACK_IMPORTED_MODULE_2__utils_parse__["a" /* parseKeysToArray */])(usersData.data, 'login'), (err, streamsData) => {
+        if (err) console.error(err) // TODO: how to properly handle an error here?
+        else {
+          if (streamsData.data.length) {
+            // if streamsData, iterate over each obj in the response looking for user matches
+            usersData.data.forEach(user => {
+              // fetch video for each user because Twitch only lets me get one at a time
+              Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* default */])('/videos?first=1&', user.id, (err, videosData) => {
+                if (err) console.error(err) // TODO: how to properly handle an error here?
+                else {
+                  // TODO: validate that extant .last_stream is older than videosData.data[0]
+                  user.last_stream = videosData.data[0]
+                  const oldUsersData = Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["a" /* getLocal */])('twitchUsersData')
+                  // if current user exists in storage replace it with new data
+                  if (oldUsersData) {
+                    if (oldUsersData.find(oldUser => oldUser.id === user.id)) {
+                      oldUsersData.splice(oldUsersData.findIndex(oldUser => oldUser.id === user.id),
+                        1, user)
+                    } else oldUsersData.push(user)
+                    Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', oldUsersData)
+                  } else Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', [user])
+                  streamsData.data.forEach(stream => {
+                    if (stream.user_id === user.id) {
+                    // if it's a match, add the stream data and append element to DOM
+                      user.cur_stream = stream
+                      Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* writeNewStreamer */])(feed, user)
+                    } else {
+                      user.cur_stream = null
+                      Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* writeNewStreamer */])(feed, user)
+                    }
+                  })
+                }
+              })
+            })
+          } else {
+            // if no streams data, store and display usersData unmodified
+            usersData.data.forEach(user => {
+              // fetch video for each user because Twitch only lets me get one at a time
+              Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* default */])('/videos?first=1&', user.id, (err, videosData) => {
+                if (err) console.error(err)
+                else {
+                  // TODO: validate that stored .last_stream is older than videosData.data[0]
+                  user.last_stream = videosData.data[0]
+                  const oldUsersData = Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["a" /* getLocal */])('twitchUsersData')
+                  // if current user exists in storage replace it with new data
+                  if (oldUsersData) {
+                    if (oldUsersData.find(oldUser => oldUser.id === user.id)) {
+                      oldUsersData.splice(oldUsersData.findIndex(oldUser => oldUser.id === user.id),
+                        1, user)
+                    } else oldUsersData.push(user)
+                    Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', oldUsersData)
+                  } else Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', [user])
                   Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* writeNewStreamer */])(feed, user)
                 }
               })
             })
-          })
-        } else {
-          // if no streams data, store and display usersData unmodified
-          usersData.data.forEach(user => {
-            // fetch video for each user because Twitch only lets me get one at a time
-            Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["a" /* default */])('/videos?first=1&', user.id, videosData => {
-              // TODO: validate that stored .last_stream is older than videosData.data[0]
-              user.last_stream = videosData.data[0]
-              const oldUsersData = Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["a" /* getLocal */])('twitchUsersData')
-              // if current user exists in storage replace it with new data
-              if (oldUsersData) {
-                if (oldUsersData.find(oldUser => oldUser.id === user.id)) {
-                  oldUsersData.splice(oldUsersData.findIndex(oldUser => oldUser.id === user.id),
-                    1, user)
-                } else oldUsersData.push(user)
-                Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', oldUsersData)
-              } else Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', [user])
-              Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* writeNewStreamer */])(feed, user)
-            })
-          })
+          }
         }
       })
     }
@@ -433,7 +448,11 @@ function fetchTwitchRoute(route, params, fn) {
   window.fetch(req)
     .then(res => {
       if (res.ok) return res.json()
-      else wtf(res.status, res.statusText)
+      else {
+        // if !res.ok callback will handle res as an error
+        fn(res)
+        wtf(res.status, res.statusText)
+      }
     })
     .then(json => {
       if (route.includes('streams')) {
