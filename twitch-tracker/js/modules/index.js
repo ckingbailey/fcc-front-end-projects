@@ -1,3 +1,4 @@
+import { writeNewStreamer, displaySearchResults } from './dom_manipulation'
 import fetchTwitchRoute, { searchTwitch } from './api-calls/fetch_twitch'
 import { parseKeysToArray } from './utils/parse'
 import { setLocal, getLocal } from './api-calls/storage.js' // NOTE: getLocal|setLocal stringifies|parse value for you
@@ -13,7 +14,12 @@ console.log('isProd? ' + isProd, 'api endpoint: ' + endpoint)
 const feed = document.getElementById('feed')
 const searchForm = document.getElementById('searchForm')
 searchForm.addEventListener('submit', handleSearchSubmit)
+const searchField = document.getElementById('searchField')
 const submitBtn = document.getElementById('submitSearch')
+const searchResultsDisplay = document.createElement('div')
+searchResultsDisplay.classList.add('search-results')
+const overlay = document.createElement('div')
+overlay.classList.add('overlay')
 
 function handleSearchSubmit(ev) {
   ev.preventDefault()
@@ -21,76 +27,16 @@ function handleSearchSubmit(ev) {
   // console.log('1', document.activeElement)
   if (term) {
     console.log(term)
-    searchTwitch(term, response => console.log(response))
+    searchTwitch(term, response => {
+      displaySearchResults(response, searchResultCard => {
+        searchResultsDisplay.appendChild(searchResultCard)
+      })
+      searchField.insertAdjacentElement('afterend', searchResultsDisplay)
+      searchResultsDisplay.insertAdjacentElement('beforebegin', overlay)
+    })
   }
   submitBtn.blur()
   // console.log('2', document.activeElement)
-}
-
-function createStreamerContainer(data, fn) {
-  // streamer container components
-  const [ streamer, imgContainer, textContainer, streamContainer ] =
-    [ document.createElement('div'), document.createElement('div'),
-      document.createElement('div'), document.createElement('div') ]
-  const streamerAvatar = document.createElement('img')
-  const userLink = document.createElement('a')
-  const userHeading = document.createElement('h2')
-  const [ userDescrip, curStream, lastStream ] =
-    [ document.createElement('p'), document.createElement('p'),
-      document.createElement('p')]
-  streamer.classList.add('streamer-container', 'flex-container')
-  streamer.appendChild(imgContainer).classList.add('flex-child', 'avatar-container')
-  streamer.appendChild(textContainer).classList.add('flex-child', 'text-container')
-  imgContainer.appendChild(streamerAvatar).classList.add('streamer-avatar')
-  textContainer.appendChild(userHeading).classList.add('streamer-name')
-  textContainer.appendChild(userDescrip).classList.add('description')
-  textContainer.appendChild(streamContainer).classList.add('stream-container')
-  userHeading.appendChild(userLink).classList.add('streamer-link')
-  userLink.setAttribute('target', '_blank')
-  streamContainer.appendChild(curStream).classList.add('current-stream')
-  streamContainer.appendChild(lastStream).classList.add('prev-stream')
-  fn(streamer, data)
-}
-
-function populateUserData(element, data, fn) {
-  element.querySelector('.streamer-avatar').src = data.profile_image_url
-  element.querySelector('.streamer-link').href = `https://www.twitch.tv/${data.login}`
-  element.querySelector('.streamer-link').innerText = data.display_name
-  element.querySelector('.description').innerText = data.description
-  fn(element, data)
-}
-
-function populateStreamData(element, data, fn) {
-  // I know, I'm sorry, this is a somewhat icky nested ternary. am I sorry? I'm not sorry
-  const streamBlurb =
-    (data.cur_stream &&
-    data.cur_stream.title)
-      ? data.cur_stream.title.slice(0, 50) +
-        (data.cur_stream.title.length > 50 ? '...' : '') : 'OFFLINE'
-  const lastStreamDate = data.last_stream && new Date(data.last_stream.published_at)
-  const curStream = element.querySelector('.current-stream')
-  const prevStream = element.querySelector('.prev-stream')
-  if (data.cur_stream) {
-    curStream.appendChild(document.createElement('i'))
-    curStream.firstChild.innerText = 'CURRENTLY STREAMING: '
-    curStream.appendChild(document.createTextNode(streamBlurb))
-  } else {
-    curStream.classList.add('offline')
-    curStream.appendChild(document.createElement('span'))
-    curStream.firstChild.innerText = 'OFFLINE'
-  }
-  if (data.last_stream) {
-    prevStream.appendChild(document.createElement('i'))
-    prevStream.firstChild.innerText = 'LAST STREAM: '
-    prevStream.appendChild(document.createTextNode(data.last_stream.title.slice(0, 50)))
-    prevStream.appendChild(document.createElement('br'))
-    prevStream.appendChild(document.createTextNode(`${lastStreamDate.toDateString()}, ${lastStreamDate.toLocaleTimeString()}`))
-  } else {
-    prevStream.classList.add('no-videos')
-    prevStream.appendChild(document.createElement('span'))
-    prevStream.firstChild.innerText = 'no videos found'
-  }
-  fn(element, data)
 }
 
 // onload, load Twitch user data
@@ -110,22 +56,10 @@ if (storedUsers) {
             // if it's a match, add the stream data and append element to DOM
             if (stream.user_id === user.id) {
               user.cur_stream = stream
-              createStreamerContainer(user, (element, user) => {
-                populateUserData(element, user, (element, user) => {
-                  populateStreamData(element, user, (element) => {
-                    feed.appendChild(element)
-                  })
-                })
-              })
+              writeNewStreamer(feed, user)
             } else {
               user.cur_stream = null
-              createStreamerContainer(user, (element, user) => {
-                populateUserData(element, user, (element, user) => {
-                  populateStreamData(element, user, (element) => {
-                    feed.appendChild(element)
-                  })
-                })
-              })
+              writeNewStreamer(feed, user)
             }
           })
         })
@@ -134,13 +68,7 @@ if (storedUsers) {
       storedUsers.forEach(user => {
         fetchTwitchRoute('/videos?first=1&', user.id, videosData => {
           user.last_stream = videosData.data[0]
-          createStreamerContainer(user, (element, user) => {
-            populateUserData(element, user, (element) => {
-              populateStreamData(element, user, (element) => {
-                feed.appendChild(element)
-              })
-            })
-          })
+          writeNewStreamer(feed, user)
         })
       })
     }
@@ -171,22 +99,10 @@ if (storedUsers) {
               if (stream.user_id === user.id) {
               // if it's a match, add the stream data and append element to DOM
                 user.cur_stream = stream
-                createStreamerContainer(user, (element, user) => {
-                  populateUserData(element, user, (element, user) => {
-                    populateStreamData(element, user, (element) => {
-                      feed.appendChild(element)
-                    })
-                  })
-                })
+                writeNewStreamer(feed, user)
               } else {
                 user.cur_stream = null
-                createStreamerContainer(user, (element, user) => {
-                  populateUserData(element, user, (element, user) => {
-                    populateStreamData(element, user, (element) => {
-                      feed.appendChild(element)
-                    })
-                  })
-                })
+                writeNewStreamer(feed, user)
               }
             })
           })
@@ -207,11 +123,7 @@ if (storedUsers) {
               } else oldUsersData.push(user)
               setLocal('twitchUsersData', oldUsersData)
             } else setLocal('twitchUsersData', [user])
-            createStreamerContainer(user, (element, user) => {
-              populateUserData(element, user, function(element) {
-                feed.appendChild(element)
-              })
-            })
+            writeNewStreamer(feed, user)
           })
         })
       }
