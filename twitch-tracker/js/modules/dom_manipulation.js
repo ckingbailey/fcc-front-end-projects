@@ -78,11 +78,12 @@ function writeNewStreamer(container, data) {
 // in case of error in fetch streamers
 function displayFetchStreamerError(container, errData) {
   const errText = document.createElement('p')
-  errText.innerText = 'My b, B. Unable to retrieve streamers data'
+  errText.innerText = 'Unable to retrieve streamers data'
   errText.classList.add('fetch-streamers-error')
   container.appendChild(errText)
 }
 
+// TODO: this fn should check if child elements already exist
 function writeNewSearchResultCard(data, fn) {
   const card = document.createElement('div')
   const addBtn = document.createElement('button')
@@ -91,7 +92,11 @@ function writeNewSearchResultCard(data, fn) {
   card.classList.add('result-item')
   addBtn.innerText = '+'
   addBtn.classList.add('add-btn')
+  addBtn.type = 'button'
   addBtn.dataset.addStreamer = data._id
+  addBtn.addEventListener('click', () =>
+    console.log(addBtn.dataset.addStreamer, 'value of This is', this)
+  )
   name.innerText = data.name
   name.classList.add('result-name')
   avatar.src = data.logo
@@ -106,7 +111,7 @@ function writeNewErrorCard(errData, fn) {
   const card = document.createElement('div')
   const errText = document.createElement('span')
   card.classList.add('search-error')
-  errText.innerText = 'My bad, B. Unable to retrieve search results'
+  errText.innerText = 'Unable to retrieve search results'
   card.appendChild(errText)
   fn(card)
 }
@@ -123,4 +128,19 @@ function displaySearchResults(err, results, fn) {
   }
 }
 
-export { writeNewStreamer, displayFetchStreamerError, displaySearchResults }
+function unrenderSearchResults(resultsContainer, parentElement) {
+  console.log('unrenderSearchResults, pls', resultsContainer)
+  // TODO: strip content from #searchResults children
+  resultsContainer.querySelectorAll('button').forEach(button => {
+    button.dataset.addStreamer = ''
+  })
+  resultsContainer.querySelectorAll('p').forEach(p => {
+    p.innerText = ''
+  })
+  resultsContainer.querySelectorAll('img').forEach(img => {
+    img.removeAttribute('src')
+  })
+  parentElement.removeChild(resultsContainer)
+}
+
+export { writeNewStreamer, displayFetchStreamerError, displaySearchResults, unrenderSearchResults }

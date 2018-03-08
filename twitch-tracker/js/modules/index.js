@@ -1,4 +1,4 @@
-import { writeNewStreamer, displayFetchStreamerError, displaySearchResults } from './dom_manipulation'
+import { writeNewStreamer, displayFetchStreamerError, displaySearchResults, unrenderSearchResults } from './dom_manipulation'
 import fetchTwitchRoute, { searchTwitch } from './api-calls/fetch_twitch'
 import { parseKeysToArray } from './utils/parse'
 import { setLocal, getLocal } from './api-calls/storage.js' // NOTE: getLocal|setLocal stringifies|parse value for you
@@ -17,10 +17,14 @@ const searchForm = document.getElementById('searchForm')
 searchForm.addEventListener('submit', handleSearchSubmit)
 const searchField = document.getElementById('searchField')
 const submitBtn = document.getElementById('submitSearch')
-const searchResultsDisplay = document.createElement('div')
+const searchResultsDisplay = document.createElement('div') // TODO: this should only be created if it doesn't already exist
+searchResultsDisplay.id = 'searchResults'
 searchResultsDisplay.classList.add('search-results')
 const overlay = document.createElement('div')
 overlay.classList.add('overlay')
+overlay.addEventListener('click', () =>
+  unrenderSearchResults(searchResultsDisplay, document.getElementById('searchContainer'))
+)
 
 function handleSearchSubmit(ev) {
   ev.preventDefault()
@@ -31,7 +35,7 @@ function handleSearchSubmit(ev) {
     searchTwitch(term, (err, response) => {
       if (err) {
         console.log('err was passed to searchTwitch callback')
-        displaySearchResults(err, null, errorCard => {
+        displaySearchResults(err, null, (errorCard) => {
           searchResultsDisplay.appendChild(errorCard)
         })
         searchField.insertAdjacentElement('afterend', searchResultsDisplay)

@@ -129,10 +129,14 @@ const searchForm = document.getElementById('searchForm')
 searchForm.addEventListener('submit', handleSearchSubmit)
 const searchField = document.getElementById('searchField')
 const submitBtn = document.getElementById('submitSearch')
-const searchResultsDisplay = document.createElement('div')
+const searchResultsDisplay = document.createElement('div') // TODO: this should only be created if it doesn't already exist
+searchResultsDisplay.id = 'searchResults'
 searchResultsDisplay.classList.add('search-results')
 const overlay = document.createElement('div')
 overlay.classList.add('overlay')
+overlay.addEventListener('click', () =>
+  Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* unrenderSearchResults */])(searchResultsDisplay, document.getElementById('searchContainer'))
+)
 
 function handleSearchSubmit(ev) {
   ev.preventDefault()
@@ -143,7 +147,7 @@ function handleSearchSubmit(ev) {
     Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["b" /* searchTwitch */])(term, (err, response) => {
       if (err) {
         console.log('err was passed to searchTwitch callback')
-        Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["b" /* displaySearchResults */])(err, null, errorCard => {
+        Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["b" /* displaySearchResults */])(err, null, (errorCard) => {
           searchResultsDisplay.appendChild(errorCard)
         })
         searchField.insertAdjacentElement('afterend', searchResultsDisplay)
@@ -184,10 +188,10 @@ if (storedUsers) {
                 // if it's a match, add the stream data and append element to DOM
                 if (stream.user_id === user.id) {
                   user.cur_stream = stream
-                  Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* writeNewStreamer */])(feed, user)
+                  Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["d" /* writeNewStreamer */])(feed, user)
                 } else {
                   user.cur_stream = null
-                  Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* writeNewStreamer */])(feed, user)
+                  Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["d" /* writeNewStreamer */])(feed, user)
                 }
               })
             }
@@ -199,7 +203,7 @@ if (storedUsers) {
             if (err) console.error(err) // TODO: how to properly handle an error here?
             else {
               user.last_stream = videosData.data[0]
-              Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* writeNewStreamer */])(feed, user)
+              Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["d" /* writeNewStreamer */])(feed, user)
             }
           })
         })
@@ -238,10 +242,10 @@ if (storedUsers) {
                     if (stream.user_id === user.id) {
                     // if it's a match, add the stream data and append element to DOM
                       user.cur_stream = stream
-                      Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* writeNewStreamer */])(feed, user)
+                      Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["d" /* writeNewStreamer */])(feed, user)
                     } else {
                       user.cur_stream = null
-                      Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* writeNewStreamer */])(feed, user)
+                      Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["d" /* writeNewStreamer */])(feed, user)
                     }
                   })
                 }
@@ -265,7 +269,7 @@ if (storedUsers) {
                     } else oldUsersData.push(user)
                     Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', oldUsersData)
                   } else Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', [user])
-                  Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* writeNewStreamer */])(feed, user)
+                  Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["d" /* writeNewStreamer */])(feed, user)
                 }
               })
             })
@@ -282,9 +286,10 @@ if (storedUsers) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return writeNewStreamer; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return writeNewStreamer; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return displayFetchStreamerError; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return displaySearchResults; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return unrenderSearchResults; });
 function createStreamerContainer(data, fn) {
   // streamer container components
   const [ streamer, imgContainer, textContainer, streamContainer ] =
@@ -365,11 +370,12 @@ function writeNewStreamer(container, data) {
 // in case of error in fetch streamers
 function displayFetchStreamerError(container, errData) {
   const errText = document.createElement('p')
-  errText.innerText = 'My b, B. Unable to retrieve streamers data'
+  errText.innerText = 'Unable to retrieve streamers data'
   errText.classList.add('fetch-streamers-error')
   container.appendChild(errText)
 }
 
+// TODO: this fn should check if child elements already exist
 function writeNewSearchResultCard(data, fn) {
   const card = document.createElement('div')
   const addBtn = document.createElement('button')
@@ -378,7 +384,11 @@ function writeNewSearchResultCard(data, fn) {
   card.classList.add('result-item')
   addBtn.innerText = '+'
   addBtn.classList.add('add-btn')
+  addBtn.type = 'button'
   addBtn.dataset.addStreamer = data._id
+  addBtn.addEventListener('click', () =>
+    console.log(addBtn.dataset.addStreamer, 'value of This is', this)
+  )
   name.innerText = data.name
   name.classList.add('result-name')
   avatar.src = data.logo
@@ -393,7 +403,7 @@ function writeNewErrorCard(errData, fn) {
   const card = document.createElement('div')
   const errText = document.createElement('span')
   card.classList.add('search-error')
-  errText.innerText = 'My bad, B. Unable to retrieve search results'
+  errText.innerText = 'Unable to retrieve search results'
   card.appendChild(errText)
   fn(card)
 }
@@ -408,6 +418,21 @@ function displaySearchResults(err, results, fn) {
       writeNewSearchResultCard(result, element => fn(element))
     })
   }
+}
+
+function unrenderSearchResults(resultsContainer, parentElement) {
+  console.log('unrenderSearchResults, pls', resultsContainer)
+  // TODO: strip content from #searchResults children
+  resultsContainer.querySelectorAll('button').forEach(button => {
+    button.dataset.addStreamer = ''
+  })
+  resultsContainer.querySelectorAll('p').forEach(p => {
+    p.innerText = ''
+  })
+  resultsContainer.querySelectorAll('img').forEach(img => {
+    img.removeAttribute('src')
+  })
+  parentElement.removeChild(resultsContainer)
 }
 
 
