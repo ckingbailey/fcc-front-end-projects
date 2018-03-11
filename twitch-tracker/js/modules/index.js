@@ -17,14 +17,24 @@ const searchForm = document.getElementById('searchForm')
 searchForm.addEventListener('submit', handleSearchSubmit)
 const searchField = document.getElementById('searchField')
 const submitBtn = document.getElementById('submitSearch')
-const searchResultsDisplay = document.createElement('div') // TODO: this should only be created if it doesn't already exist
-searchResultsDisplay.id = 'searchResults'
-searchResultsDisplay.classList.add('search-results')
+const searchResponseDropdown = document.createElement('div')
+searchResponseDropdown.id = 'searchDropdown'
+searchResponseDropdown.classList.add('search-dropdown')
+const searchResultsContainer = document.createElement('div') // TODO: this should only be created if it doesn't already exist
+searchResultsContainer.id = 'searchResults'
+searchResultsContainer.classList.add('search-results')
 const overlay = document.createElement('div')
 overlay.classList.add('overlay')
-overlay.addEventListener('click', () =>
-  unrenderSearchResults(searchResultsDisplay, document.getElementById('searchContainer'))
-)
+overlay.addEventListener('click', e => {
+  const element = searchResponseDropdown.children['searchErrorMsg'] || searchResultsContainer
+  if (searchResultsContainer.children.length) {
+    // if search results are displayed, strip out data before removing elements
+    unrenderSearchResults(element)
+  }
+  searchResponseDropdown.removeChild(element)
+  document.getElementById('searchContainer').removeChild(searchResponseDropdown)
+  e.target.parentElement.removeChild(e.target)
+})
 
 function handleSearchSubmit(ev) {
   ev.preventDefault()
@@ -33,22 +43,26 @@ function handleSearchSubmit(ev) {
   if (term) {
     console.log(term)
     searchTwitch(term, (err, response) => {
-      if (err) {
+      // if err or no search results append error msg directly to dropdown
+      if (err || !response._total) {
         console.log('err was passed to searchTwitch callback')
-        displaySearchResults(err, null, (errorCard) => {
-          searchResultsDisplay.appendChild(errorCard)
+        displaySearchResults(err, null, searchResponseDropdown, errorCard => {
+        // QUESTION: is this callback an opportunity for currying?
+        // fn picks up 1st arg, parent el, from displaySearchResults
+        // and then fn picks up 2nd arg, child els, from write"Whatever"Card
+          searchResponseDropdown.appendChild(errorCard)
         })
-        searchField.insertAdjacentElement('afterend', searchResultsDisplay)
-        main.insertAdjacentElement('beforebegin', overlay)
       } else {
-        console.log('response was passed to searchTwitch callback')
-        displaySearchResults(null, response, searchResultCard => {
-          searchResultsDisplay.appendChild(searchResultCard)
+        console.log('response was passed to searchTwitch callback', response)
+        displaySearchResults(null, response, searchResultsContainer, searchResultCard => {
+          searchResultsContainer.appendChild(searchResultCard)
         })
-        searchField.insertAdjacentElement('afterend', searchResultsDisplay)
+        searchResponseDropdown.appendChild(searchResultsContainer)
+        searchField.insertAdjacentElement('afterend', searchResponseDropdown)
         main.insertAdjacentElement('beforebegin', overlay)
       }
     })
+    ev.target.children['searchContainer'].children['searchField'].value = ''
   }
   submitBtn.blur()
   searchField.blur()

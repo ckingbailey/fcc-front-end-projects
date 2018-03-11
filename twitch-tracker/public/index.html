@@ -89,16 +89,18 @@
       box-shadow: 0 0 2px var(--lt-blue);
       border: 2px solid var(--lt-blue);
     }
-    .search-results {
+    .search-dropdown {
       z-index: 2;
       position: absolute;
       top: 3.125rem; /* this value is a work in progress */
-      left: 2px;
+      left: -2px;
       border: 1px solid var(--dark-blue);
-      width: calc(100% - 4px);
+      width: 100%;
       padding: var(--pad-box);
       background-color: white;
       text-align: left;
+    }
+    .search-results {
     }
     .result-item {
       margin-bottom: .25rem;

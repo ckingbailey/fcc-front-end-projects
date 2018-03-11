@@ -36,7 +36,7 @@ export default function fetchTwitchRoute(route, params, fn) {
     })
     .then(json => {
       if (route.includes('streams')) {
-        console.log('streams response', target, json)
+        // console.log('streams response', target, json)
       }
       // callback should handle error first, json second
       return fn(null, json)
@@ -52,7 +52,7 @@ export default function fetchTwitchRoute(route, params, fn) {
 function searchTwitch(term, fn) {
   const target = endpoint + '/search/channels?' + parseParamsToString('/search', term)
   const req = new window.Request(target)
-  console.log('search target:', target)
+  // console.log('search target:', target)
   window.fetch(req)
     .then(res => {
       return res.json()
@@ -61,7 +61,7 @@ function searchTwitch(term, fn) {
       fn(null, json)
     })
     .catch(err => {
-      console.log(typeof err, err)
+      // console.log(typeof err, err)
       fn(err)
     })
 }

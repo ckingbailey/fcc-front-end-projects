@@ -83,52 +83,103 @@ function displayFetchStreamerError(container, errData) {
   container.appendChild(errText)
 }
 
-// TODO: this fn should check if child elements already exist
-function writeNewSearchResultCard(data, fn) {
-  const card = document.createElement('div')
-  const addBtn = document.createElement('button')
-  const name = document.createElement('p')
-  const avatar = document.createElement('img')
-  card.classList.add('result-item')
-  addBtn.innerText = '+'
-  addBtn.classList.add('add-btn')
-  addBtn.type = 'button'
-  addBtn.dataset.addStreamer = data._id
-  addBtn.addEventListener('click', () =>
-    console.log(addBtn.dataset.addStreamer, 'value of This is', this)
-  )
-  name.innerText = data.name
-  name.classList.add('result-name')
-  avatar.src = data.logo
-  avatar.classList.add('result-avatar')
-  card.appendChild(addBtn)
-  card.appendChild(name)
-  card.appendChild(avatar)
-  fn(card)
+// TODO: this fn should validate args first
+function writeNewSearchResultCard(data, element, fn) {
+  // QUESTION: how to reference container element to check for its existence
+  if (element && element.nodeName) {
+    element.querySelector('button').dataset.addStreamer = data._id
+    element.querySelector('p').innerText = data.name
+    element.querySelector('img').src = data.logo
+    fn(element)
+  } else {
+    const card = document.createElement('div')
+    const addBtn = document.createElement('button')
+    const name = document.createElement('p')
+    const avatar = document.createElement('img')
+    card.classList.add('result-item')
+    addBtn.innerText = '+'
+    addBtn.classList.add('add-btn')
+    addBtn.type = 'button'
+    addBtn.dataset.addStreamer = data._id
+    addBtn.addEventListener('click', e =>
+      console.log(addBtn.dataset.addStreamer, 'event target is', e.target)
+    )
+    name.innerText = data.name
+    name.classList.add('result-name')
+    avatar.src = data.logo
+    avatar.classList.add('result-avatar')
+    card.appendChild(addBtn)
+    card.appendChild(name)
+    card.appendChild(avatar)
+    // QUESTION: do I need to pass container here, or can I rely on the fn that calls wNSRC?
+    fn(card)
+  }
 }
 
-function writeNewErrorCard(errData, fn) {
+function writeNewErrorCard(err, data, fn) {
   const card = document.createElement('div')
   const errText = document.createElement('span')
-  card.classList.add('search-error')
-  errText.innerText = 'Unable to retrieve search results'
+  card.id = 'searchErrorMsg'
   card.appendChild(errText)
+  if (err) {
+    card.classList.add('search-error')
+    errText.innerText = 'Unable to retrieve search results'
+  } else {
+    card.classList.add('search-error')
+    errText.innerText = 'No results found for your search'
+  }
   fn(card)
 }
 
 // iterates over search results to write DOM elements
 // takes as args the results data and an ultimate callback
-function displaySearchResults(err, results, fn) {
-  console.log(results)
-  if (err) writeNewErrorCard(err, element => fn(element))
-  else {
-    results.channels.forEach(result => {
-      writeNewSearchResultCard(result, element => fn(element))
-    })
+// TODO: validate arguments
+// QUESTION: how to validate error arg?
+function displaySearchResults(err, results, container, fn) {
+  // console.log(results)
+  if (err || !results) {
+    console.log('err was passed to displaySrchRes')
+    return writeNewErrorCard(err, null, fn)
+  } else {
+    console.log('err was not passed to displaySrchRes')
+    // TODO: check for existining of .result elements
+    // if they exist, iterate over them until either
+    // - (1) all result data is consumed, or
+    // - (2) all .result elements are filled, in which case create more
+    const elements = container.querySelectorAll('.result-item')
+    if (elements.length) {
+      console.log('elements condition of displaySrchRes', elements)
+      // only follow this course if there are search results
+      if (results.channels.length) {
+        console.log('search results returned')
+        if (elements.length >= results.channels.length) {
+          console.log('elements is longer than results in displaySrchRes',
+            elements.length, results.channels.length)
+          elements.slice(0, results.channels.length).forEach((el, i) => {
+            writeNewSearchResultCard(results.channels[i], el, fn)
+          })
+        } else {
+          console.log('elements is shorter than results in displaySrchRes',
+            elements.length, results.channels.length)
+          results.channels.forEach((el, i) => {
+            writeNewSearchResultCard(el, elements[i], fn)
+          })
+        }
+      } else {
+        console.log('no search results returned')
+        writeNewErrorCard(null, results, fn)
+      }
+    } else {
+      console.log('!elements condition of displaySrchRes', elements)
+      results.channels.forEach(result => {
+        writeNewSearchResultCard(result, null, fn)
+      })
+    }
   }
 }
 
-function unrenderSearchResults(resultsContainer, parentElement) {
+// TODO: different unrender pattern for results vs. error
+function unrenderSearchResults(resultsContainer, fn) {
   console.log('unrenderSearchResults, pls', resultsContainer)
   // TODO: strip content from #searchResults children
   resultsContainer.querySelectorAll('button').forEach(button => {
@@ -140,7 +191,7 @@ function unrenderSearchResults(resultsContainer, parentElement) {
   resultsContainer.querySelectorAll('img').forEach(img => {
     img.removeAttribute('src')
   })
-  parentElement.removeChild(resultsContainer)
+  fn(resultsContainer)
 }
 
 export { writeNewStreamer, displayFetchStreamerError, displaySearchResults, unrenderSearchResults }

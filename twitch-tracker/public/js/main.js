@@ -129,14 +129,24 @@ const searchForm = document.getElementById('searchForm')
 searchForm.addEventListener('submit', handleSearchSubmit)
 const searchField = document.getElementById('searchField')
 const submitBtn = document.getElementById('submitSearch')
-const searchResultsDisplay = document.createElement('div') // TODO: this should only be created if it doesn't already exist
-searchResultsDisplay.id = 'searchResults'
-searchResultsDisplay.classList.add('search-results')
+const searchResponseDropdown = document.createElement('div')
+searchResponseDropdown.id = 'searchDropdown'
+searchResponseDropdown.classList.add('search-dropdown')
+const searchResultsContainer = document.createElement('div') // TODO: this should only be created if it doesn't already exist
+searchResultsContainer.id = 'searchResults'
+searchResultsContainer.classList.add('search-results')
 const overlay = document.createElement('div')
 overlay.classList.add('overlay')
-overlay.addEventListener('click', () =>
-  Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* unrenderSearchResults */])(searchResultsDisplay, document.getElementById('searchContainer'))
-)
+overlay.addEventListener('click', e => {
+  const element = searchResponseDropdown.children['searchErrorMsg'] || searchResultsContainer
+  if (searchResultsContainer.children.length) {
+    // if search results are displayed, strip out data before removing elements
+    Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* unrenderSearchResults */])(element)
+  }
+  searchResponseDropdown.removeChild(element)
+  document.getElementById('searchContainer').removeChild(searchResponseDropdown)
+  e.target.parentElement.removeChild(e.target)
+})
 
 function handleSearchSubmit(ev) {
   ev.preventDefault()
@@ -145,22 +155,26 @@ function handleSearchSubmit(ev) {
   if (term) {
     console.log(term)
     Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["b" /* searchTwitch */])(term, (err, response) => {
-      if (err) {
+      // if err or no search results append error msg directly to dropdown
+      if (err || !response._total) {
         console.log('err was passed to searchTwitch callback')
-        Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["b" /* displaySearchResults */])(err, null, (errorCard) => {
-          searchResultsDisplay.appendChild(errorCard)
+        Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["b" /* displaySearchResults */])(err, null, searchResponseDropdown, errorCard => {
+        // QUESTION: is this callback an opportunity for currying?
+        // fn picks up 1st arg, parent el, from displaySearchResults
+        // and then fn picks up 2nd arg, child els, from write"Whatever"Card
+          searchResponseDropdown.appendChild(errorCard)
         })
-        searchField.insertAdjacentElement('afterend', searchResultsDisplay)
-        main.insertAdjacentElement('beforebegin', overlay)
       } else {
-        console.log('response was passed to searchTwitch callback')
-        Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["b" /* displaySearchResults */])(null, response, searchResultCard => {
-          searchResultsDisplay.appendChild(searchResultCard)
+        console.log('response was passed to searchTwitch callback', response)
+        Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["b" /* displaySearchResults */])(null, response, searchResultsContainer, searchResultCard => {
+          searchResultsContainer.appendChild(searchResultCard)
         })
-        searchField.insertAdjacentElement('afterend', searchResultsDisplay)
+        searchResponseDropdown.appendChild(searchResultsContainer)
+        searchField.insertAdjacentElement('afterend', searchResponseDropdown)
         main.insertAdjacentElement('beforebegin', overlay)
       }
     })
+    ev.target.children['searchContainer'].children['searchField'].value = ''
   }
   submitBtn.blur()
   searchField.blur()
@@ -375,52 +389,103 @@ function displayFetchStreamerError(container, errData) {
   container.appendChild(errText)
 }
 
-// TODO: this fn should check if child elements already exist
-function writeNewSearchResultCard(data, fn) {
-  const card = document.createElement('div')
-  const addBtn = document.createElement('button')
-  const name = document.createElement('p')
-  const avatar = document.createElement('img')
-  card.classList.add('result-item')
-  addBtn.innerText = '+'
-  addBtn.classList.add('add-btn')
-  addBtn.type = 'button'
-  addBtn.dataset.addStreamer = data._id
-  addBtn.addEventListener('click', () =>
-    console.log(addBtn.dataset.addStreamer, 'value of This is', this)
-  )
-  name.innerText = data.name
-  name.classList.add('result-name')
-  avatar.src = data.logo
-  avatar.classList.add('result-avatar')
-  card.appendChild(addBtn)
-  card.appendChild(name)
-  card.appendChild(avatar)
-  fn(card)
+// TODO: this fn should validate args first
+function writeNewSearchResultCard(data, element, fn) {
+  // QUESTION: how to reference container element to check for its existence
+  if (element && element.nodeName) {
+    element.querySelector('button').dataset.addStreamer = data._id
+    element.querySelector('p').innerText = data.name
+    element.querySelector('img').src = data.logo
+    fn(element)
+  } else {
+    const card = document.createElement('div')
+    const addBtn = document.createElement('button')
+    const name = document.createElement('p')
+    const avatar = document.createElement('img')
+    card.classList.add('result-item')
+    addBtn.innerText = '+'
+    addBtn.classList.add('add-btn')
+    addBtn.type = 'button'
+    addBtn.dataset.addStreamer = data._id
+    addBtn.addEventListener('click', e =>
+      console.log(addBtn.dataset.addStreamer, 'event target is', e.target)
+    )
+    name.innerText = data.name
+    name.classList.add('result-name')
+    avatar.src = data.logo
+    avatar.classList.add('result-avatar')
+    card.appendChild(addBtn)
+    card.appendChild(name)
+    card.appendChild(avatar)
+    // QUESTION: do I need to pass container here, or can I rely on the fn that calls wNSRC?
+    fn(card)
+  }
 }
 
-function writeNewErrorCard(errData, fn) {
+function writeNewErrorCard(err, data, fn) {
   const card = document.createElement('div')
   const errText = document.createElement('span')
-  card.classList.add('search-error')
-  errText.innerText = 'Unable to retrieve search results'
+  card.id = 'searchErrorMsg'
   card.appendChild(errText)
+  if (err) {
+    card.classList.add('search-error')
+    errText.innerText = 'Unable to retrieve search results'
+  } else {
+    card.classList.add('search-error')
+    errText.innerText = 'No results found for your search'
+  }
   fn(card)
 }
 
 // iterates over search results to write DOM elements
 // takes as args the results data and an ultimate callback
-function displaySearchResults(err, results, fn) {
-  console.log(results)
-  if (err) writeNewErrorCard(err, element => fn(element))
-  else {
-    results.channels.forEach(result => {
-      writeNewSearchResultCard(result, element => fn(element))
-    })
+// TODO: validate arguments
+// QUESTION: how to validate error arg?
+function displaySearchResults(err, results, container, fn) {
+  // console.log(results)
+  if (err || !results) {
+    console.log('err was passed to displaySrchRes')
+    return writeNewErrorCard(err, null, fn)
+  } else {
+    console.log('err was not passed to displaySrchRes')
+    // TODO: check for existining of .result elements
+    // if they exist, iterate over them until either
+    // - (1) all result data is consumed, or
+    // - (2) all .result elements are filled, in which case create more
+    const elements = container.querySelectorAll('.result-item')
+    if (elements.length) {
+      console.log('elements condition of displaySrchRes', elements)
+      // only follow this course if there are search results
+      if (results.channels.length) {
+        console.log('search results returned')
+        if (elements.length >= results.channels.length) {
+          console.log('elements is longer than results in displaySrchRes',
+            elements.length, results.channels.length)
+          elements.slice(0, results.channels.length).forEach((el, i) => {
+            writeNewSearchResultCard(results.channels[i], el, fn)
+          })
+        } else {
+          console.log('elements is shorter than results in displaySrchRes',
+            elements.length, results.channels.length)
+          results.channels.forEach((el, i) => {
+            writeNewSearchResultCard(el, elements[i], fn)
+          })
+        }
+      } else {
+        console.log('no search results returned')
+        writeNewErrorCard(null, results, fn)
+      }
+    } else {
+      console.log('!elements condition of displaySrchRes', elements)
+      results.channels.forEach(result => {
+        writeNewSearchResultCard(result, null, fn)
+      })
+    }
   }
 }
 
-function unrenderSearchResults(resultsContainer, parentElement) {
+// TODO: different unrender pattern for results vs. error
+function unrenderSearchResults(resultsContainer, fn) {
   console.log('unrenderSearchResults, pls', resultsContainer)
   // TODO: strip content from #searchResults children
   resultsContainer.querySelectorAll('button').forEach(button => {
@@ -432,7 +497,7 @@ function unrenderSearchResults(resultsContainer, parentElement) {
   resultsContainer.querySelectorAll('img').forEach(img => {
     img.removeAttribute('src')
   })
-  parentElement.removeChild(resultsContainer)
+  fn(resultsContainer)
 }
 
 
@@ -484,7 +549,7 @@ function fetchTwitchRoute(route, params, fn) {
     })
     .then(json => {
       if (route.includes('streams')) {
-        console.log('streams response', target, json)
+        // console.log('streams response', target, json)
       }
       // callback should handle error first, json second
       return fn(null, json)
@@ -500,7 +565,7 @@ function fetchTwitchRoute(route, params, fn) {
 function searchTwitch(term, fn) {
   const target = endpoint + '/search/channels?' + Object(__WEBPACK_IMPORTED_MODULE_0__utils_parse__["b" /* parseParamsToString */])('/search', term)
   const req = new window.Request(target)
-  console.log('search target:', target)
+  // console.log('search target:', target)
   window.fetch(req)
     .then(res => {
       return res.json()
@@ -509,7 +574,7 @@ function searchTwitch(term, fn) {
       fn(null, json)
     })
     .catch(err => {
-      console.log(typeof err, err)
+      // console.log(typeof err, err)
       fn(err)
     })
 }
