@@ -85,12 +85,13 @@ function displayFetchStreamerError(container, errData) {
 
 // TODO: this fn should validate args first
 function writeNewSearchResultCard(data, element, fn) {
+  console.log(element, data.display_name)
   // QUESTION: how to reference container element to check for its existence
   if (element && element.nodeName) {
     element.querySelector('button').dataset.addStreamer = data._id
     element.querySelector('p').innerText = data.name
     element.querySelector('img').src = data.logo
-    fn(element)
+    fn(element, null)
   } else {
     const card = document.createElement('div')
     const addBtn = document.createElement('button')
@@ -111,7 +112,6 @@ function writeNewSearchResultCard(data, element, fn) {
     card.appendChild(addBtn)
     card.appendChild(name)
     card.appendChild(avatar)
-    // QUESTION: do I need to pass container here, or can I rely on the fn that calls wNSRC?
     fn(card)
   }
 }
@@ -139,7 +139,7 @@ function displaySearchResults(err, results, container, fn) {
   // console.log(results)
   if (err || !results) {
     console.log('err was passed to displaySrchRes')
-    return writeNewErrorCard(err, null, fn)
+    writeNewErrorCard(err, null, fn)
   } else {
     console.log('err was not passed to displaySrchRes')
     // TODO: check for existining of .result elements
@@ -153,16 +153,23 @@ function displaySearchResults(err, results, container, fn) {
       if (results.channels.length) {
         console.log('search results returned')
         if (elements.length >= results.channels.length) {
-          console.log('elements is longer than results in displaySrchRes',
+          console.log('`elements` is equal to or longer than `results` in displaySrchRes',
             elements.length, results.channels.length)
-          elements.slice(0, results.channels.length).forEach((el, i) => {
-            writeNewSearchResultCard(results.channels[i], el, fn)
+          // TODO: remove all elements beyond results.channels.length
+          elements.forEach((el, i) => {
+            if (results.channels[i]) {
+              writeNewSearchResultCard(results.channels[i], el, card => {
+                fn(card, null)
+              })
+            } else container.removeChild(el) // QUESTION: how do I hold on to removed children?
           })
         } else {
-          console.log('elements is shorter than results in displaySrchRes',
+          console.log('`elements` is shorter than `results` in displaySrchRes',
             elements.length, results.channels.length)
-          results.channels.forEach((el, i) => {
-            writeNewSearchResultCard(el, elements[i], fn)
+          results.channels.forEach((result, i) => {
+            writeNewSearchResultCard(result, elements[i], card => {
+              fn(card, container)
+            })
           })
         }
       } else {
@@ -172,7 +179,9 @@ function displaySearchResults(err, results, container, fn) {
     } else {
       console.log('!elements condition of displaySrchRes', elements)
       results.channels.forEach(result => {
-        writeNewSearchResultCard(result, null, fn)
+        writeNewSearchResultCard(result, null, card => {
+          fn(card, container)
+        })
       })
     }
   }

@@ -58,10 +58,11 @@ function searchTwitch(term, fn) {
       return res.json()
     })
     .then(json => {
+      console.log('twitch response rec\'d:', json)
       fn(null, json)
     })
     .catch(err => {
-      // console.log(typeof err, err)
+      console.log('searchTwitch error:', err)
       fn(err)
     })
 }

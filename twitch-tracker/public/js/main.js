@@ -139,12 +139,13 @@ const overlay = document.createElement('div')
 overlay.classList.add('overlay')
 overlay.addEventListener('click', e => {
   const element = searchResponseDropdown.children['searchErrorMsg'] || searchResultsContainer
-  if (searchResultsContainer.children.length) {
-    // if search results are displayed, strip out data before removing elements
-    Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* unrenderSearchResults */])(element)
-  }
+  // if (searchResultsContainer.children.length) {
+  //   // if search results are displayed, strip out data before removing elements
+  //   unrenderSearchResults(element)
+  // }
   searchResponseDropdown.removeChild(element)
   document.getElementById('searchContainer').removeChild(searchResponseDropdown)
+  console.log('unrender search results, pls', document.getElementById('searchContainer').children)
   e.target.parentElement.removeChild(e.target)
 })
 
@@ -157,7 +158,7 @@ function handleSearchSubmit(ev) {
     Object(__WEBPACK_IMPORTED_MODULE_1__api_calls_fetch_twitch__["b" /* searchTwitch */])(term, (err, response) => {
       // if err or no search results append error msg directly to dropdown
       if (err || !response._total) {
-        console.log('err was passed to searchTwitch callback')
+        console.log('err was passed to searchTwitch callback', err, response._total)
         Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["b" /* displaySearchResults */])(err, null, searchResponseDropdown, errorCard => {
         // QUESTION: is this callback an opportunity for currying?
         // fn picks up 1st arg, parent el, from displaySearchResults
@@ -166,8 +167,10 @@ function handleSearchSubmit(ev) {
         })
       } else {
         console.log('response was passed to searchTwitch callback', response)
-        Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["b" /* displaySearchResults */])(null, response, searchResultsContainer, searchResultCard => {
-          searchResultsContainer.appendChild(searchResultCard)
+        Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["b" /* displaySearchResults */])(null, response, searchResultsContainer, (card, container) => {
+          console.log('arguments to dSR/wNSRC callback:', card, container)
+          if (container) container.appendChild(card)
+          // TODO: handle removal of unused element children in such a way that I hold onto those children in a var
         })
         searchResponseDropdown.appendChild(searchResultsContainer)
         searchField.insertAdjacentElement('afterend', searchResponseDropdown)
@@ -202,10 +205,10 @@ if (storedUsers) {
                 // if it's a match, add the stream data and append element to DOM
                 if (stream.user_id === user.id) {
                   user.cur_stream = stream
-                  Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["d" /* writeNewStreamer */])(feed, user)
+                  Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* writeNewStreamer */])(feed, user)
                 } else {
                   user.cur_stream = null
-                  Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["d" /* writeNewStreamer */])(feed, user)
+                  Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* writeNewStreamer */])(feed, user)
                 }
               })
             }
@@ -217,7 +220,7 @@ if (storedUsers) {
             if (err) console.error(err) // TODO: how to properly handle an error here?
             else {
               user.last_stream = videosData.data[0]
-              Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["d" /* writeNewStreamer */])(feed, user)
+              Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* writeNewStreamer */])(feed, user)
             }
           })
         })
@@ -256,10 +259,10 @@ if (storedUsers) {
                     if (stream.user_id === user.id) {
                     // if it's a match, add the stream data and append element to DOM
                       user.cur_stream = stream
-                      Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["d" /* writeNewStreamer */])(feed, user)
+                      Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* writeNewStreamer */])(feed, user)
                     } else {
                       user.cur_stream = null
-                      Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["d" /* writeNewStreamer */])(feed, user)
+                      Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* writeNewStreamer */])(feed, user)
                     }
                   })
                 }
@@ -283,7 +286,7 @@ if (storedUsers) {
                     } else oldUsersData.push(user)
                     Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', oldUsersData)
                   } else Object(__WEBPACK_IMPORTED_MODULE_3__api_calls_storage_js__["b" /* setLocal */])('twitchUsersData', [user])
-                  Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["d" /* writeNewStreamer */])(feed, user)
+                  Object(__WEBPACK_IMPORTED_MODULE_0__dom_manipulation__["c" /* writeNewStreamer */])(feed, user)
                 }
               })
             })
@@ -300,10 +303,10 @@ if (storedUsers) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return writeNewStreamer; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return writeNewStreamer; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return displayFetchStreamerError; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return displaySearchResults; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return unrenderSearchResults; });
+/* unused harmony export unrenderSearchResults */
 function createStreamerContainer(data, fn) {
   // streamer container components
   const [ streamer, imgContainer, textContainer, streamContainer ] =
@@ -391,12 +394,13 @@ function displayFetchStreamerError(container, errData) {
 
 // TODO: this fn should validate args first
 function writeNewSearchResultCard(data, element, fn) {
+  console.log(element, data.display_name)
   // QUESTION: how to reference container element to check for its existence
   if (element && element.nodeName) {
     element.querySelector('button').dataset.addStreamer = data._id
     element.querySelector('p').innerText = data.name
     element.querySelector('img').src = data.logo
-    fn(element)
+    fn(element, null)
   } else {
     const card = document.createElement('div')
     const addBtn = document.createElement('button')
@@ -417,7 +421,6 @@ function writeNewSearchResultCard(data, element, fn) {
     card.appendChild(addBtn)
     card.appendChild(name)
     card.appendChild(avatar)
-    // QUESTION: do I need to pass container here, or can I rely on the fn that calls wNSRC?
     fn(card)
   }
 }
@@ -445,7 +448,7 @@ function displaySearchResults(err, results, container, fn) {
   // console.log(results)
   if (err || !results) {
     console.log('err was passed to displaySrchRes')
-    return writeNewErrorCard(err, null, fn)
+    writeNewErrorCard(err, null, fn)
   } else {
     console.log('err was not passed to displaySrchRes')
     // TODO: check for existining of .result elements
@@ -459,16 +462,23 @@ function displaySearchResults(err, results, container, fn) {
       if (results.channels.length) {
         console.log('search results returned')
         if (elements.length >= results.channels.length) {
-          console.log('elements is longer than results in displaySrchRes',
+          console.log('`elements` is equal to or longer than `results` in displaySrchRes',
             elements.length, results.channels.length)
-          elements.slice(0, results.channels.length).forEach((el, i) => {
-            writeNewSearchResultCard(results.channels[i], el, fn)
+          // TODO: remove all elements beyond results.channels.length
+          elements.forEach((el, i) => {
+            if (results.channels[i]) {
+              writeNewSearchResultCard(results.channels[i], el, card => {
+                fn(card, null)
+              })
+            } else container.removeChild(el) // QUESTION: how do I hold on to removed children?
           })
         } else {
-          console.log('elements is shorter than results in displaySrchRes',
+          console.log('`elements` is shorter than `results` in displaySrchRes',
             elements.length, results.channels.length)
-          results.channels.forEach((el, i) => {
-            writeNewSearchResultCard(el, elements[i], fn)
+          results.channels.forEach((result, i) => {
+            writeNewSearchResultCard(result, elements[i], card => {
+              fn(card, container)
+            })
           })
         }
       } else {
@@ -478,7 +488,9 @@ function displaySearchResults(err, results, container, fn) {
     } else {
       console.log('!elements condition of displaySrchRes', elements)
       results.channels.forEach(result => {
-        writeNewSearchResultCard(result, null, fn)
+        writeNewSearchResultCard(result, null, card => {
+          fn(card, container)
+        })
       })
     }
   }
@@ -571,10 +583,11 @@ function searchTwitch(term, fn) {
       return res.json()
     })
     .then(json => {
+      console.log('twitch response rec\'d:', json)
       fn(null, json)
     })
     .catch(err => {
-      // console.log(typeof err, err)
+      console.log('searchTwitch error:', err)
       fn(err)
     })
 }

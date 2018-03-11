@@ -27,12 +27,13 @@ const overlay = document.createElement('div')
 overlay.classList.add('overlay')
 overlay.addEventListener('click', e => {
   const element = searchResponseDropdown.children['searchErrorMsg'] || searchResultsContainer
-  if (searchResultsContainer.children.length) {
-    // if search results are displayed, strip out data before removing elements
-    unrenderSearchResults(element)
-  }
+  // if (searchResultsContainer.children.length) {
+  //   // if search results are displayed, strip out data before removing elements
+  //   unrenderSearchResults(element)
+  // }
   searchResponseDropdown.removeChild(element)
   document.getElementById('searchContainer').removeChild(searchResponseDropdown)
+  console.log('unrender search results, pls', document.getElementById('searchContainer').children)
   e.target.parentElement.removeChild(e.target)
 })
 
@@ -45,7 +46,7 @@ function handleSearchSubmit(ev) {
     searchTwitch(term, (err, response) => {
       // if err or no search results append error msg directly to dropdown
       if (err || !response._total) {
-        console.log('err was passed to searchTwitch callback')
+        console.log('err was passed to searchTwitch callback', err, response._total)
         displaySearchResults(err, null, searchResponseDropdown, errorCard => {
         // QUESTION: is this callback an opportunity for currying?
         // fn picks up 1st arg, parent el, from displaySearchResults
@@ -54,8 +55,10 @@ function handleSearchSubmit(ev) {
         })
       } else {
         console.log('response was passed to searchTwitch callback', response)
-        displaySearchResults(null, response, searchResultsContainer, searchResultCard => {
-          searchResultsContainer.appendChild(searchResultCard)
+        displaySearchResults(null, response, searchResultsContainer, (card, container) => {
+          console.log('arguments to dSR/wNSRC callback:', card, container)
+          if (container) container.appendChild(card)
+          // TODO: handle removal of unused element children in such a way that I hold onto those children in a var
         })
         searchResponseDropdown.appendChild(searchResultsContainer)
         searchField.insertAdjacentElement('afterend', searchResponseDropdown)
