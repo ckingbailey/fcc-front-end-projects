@@ -1,5 +1,9 @@
 {
   "name": "fcc-project-server",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ckingbailey/fcc-front-end-projects"
+  },
   "version": "0.0.1",
   "description": "one server to rule them all",
   "main": "index.js",
@@ -20,11 +24,10 @@
   },
   "devDependencies": {
     "dotenv": "^5.0.0",
-    "eslint": "^4.16.0",
-    "eslint-plugin-import": "^2.8.0",
+    "eslint": "^5.5.0",
     "eslint-plugin-node": "^5.2.1",
     "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-standard": "^3.0.1",
-    "nodemon": "^1.14.11"
+    "nodemon": "^1.18.4"
   }
 }
